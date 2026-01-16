@@ -1,25 +1,41 @@
 <script>
-    export let tr;
+	import { fade } from 'svelte/transition';
+	export let tr;
+	$: fileName = tr.fileName ? tr.fileName.split('_WHSHPR_')[1] : 'Initializing...';
 </script>
 
-<div class="alert alert-info p-3">
-    <span class="loading loading-dots loading-md"></span>
-    <span>
-        <p class="font-bold text-info-content text-md flex items-center justify-center space-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language-hiragana" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                <path d="M4 5h7"></path>
-                <path d="M7 4c0 4.846 0 7 .5 8"></path>
-                <path d="M10 8.5c0 2.286 -2 4.5 -3.5 4.5s-2.5 -1.135 -2.5 -2c0 -2 1 -3 3 -3s5 .57 5 2.857c0 1.524 -.667 2.571 -2 3.143"></path>
-                <path d="M12 20l4 -9l4 9"></path>
-                <path d="M19.1 18h-6.2"></path>
-            </svg>
-            <span>{tr.fileName != "" ? tr.fileName.split("_WHSHPR_")[1] : tr.id}</span>
-        </p>
-        <p class="opacity-60">
-            <span class="font-mono text-info-content text-sm ">
-                Waiting for translation...
-            </span>
-        </p>
-    </span>
+<div
+	class="group relative bg-base-200/30 border border-secondary/30 border-dashed rounded-2xl p-5 md:p-6 transition-all duration-300 shadow-sm mt-4 animate-pulse"
+	in:fade
+>
+	<div class="flex flex-col md:flex-row gap-6 items-center">
+		<!-- Visual Column -->
+		<div
+			class="hidden md:flex flex-col items-center justify-center bg-secondary/10 rounded-xl p-4 min-w-[100px] border border-secondary/10"
+		>
+			<div
+				class="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center text-secondary mb-2"
+			>
+				<span class="loading loading-dots loading-md"></span>
+			</div>
+			<span class="text-[10px] font-bold uppercase tracking-wider opacity-60 italic text-secondary"
+				>Translating</span
+			>
+		</div>
+
+		<!-- Content Column -->
+		<div class="flex-1 flex flex-col justify-center space-y-2 text-center md:text-left">
+			<div class="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-1">
+				<h3 class="text-lg font-bold text-base-content/60 truncate max-w-md">
+					{fileName}
+				</h3>
+				<div class="badge badge-secondary badge-outline badge-sm font-bold uppercase text-[10px]">
+					Processing
+				</div>
+			</div>
+			<p class="text-sm font-mono opacity-50">
+				Converting your text to the target language. Please wait...
+			</p>
+		</div>
+	</div>
 </div>

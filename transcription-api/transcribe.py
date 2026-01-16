@@ -15,18 +15,20 @@ def convert_audio(file) -> np.ndarray:
 async def transcribe_from_filename(filename: str,
                                     model_size: str,
                                     language: Optional[str] = None,
-                                    device: DeviceType = DeviceType.cpu) -> Transcription:
+                                    device: DeviceType = DeviceType.cpu,
+                                    task: str = "transcribe") -> Transcription:
     
     filepath = os.path.join(os.environ["UPLOAD_DIR"], filename)
     if not os.path.exists(filepath):
         raise RuntimeError(f"file not found in {filepath}")
     audio = convert_audio(filepath)
-    return await transcribe_audio(audio, model_size, language, device)
+    return await transcribe_audio(audio, model_size, language, device, task)
 
 async def transcribe_file(file: io.BytesIO, 
                           model_size: str, 
                           language: Optional[str] = None, 
-                          device: DeviceType = DeviceType.cpu) -> Transcription:
+                          device: DeviceType = DeviceType.cpu,
+                          task: str = "transcribe") -> Transcription:
     contents = await file.read()  # async read
     if len(contents) < 150 * 1024 * 1024:  # file is smaller than 150MB
             audio = convert_audio(io.BytesIO(contents))
@@ -40,12 +42,13 @@ async def transcribe_file(file: io.BytesIO,
         # Corrected to use the function in this file
         audio = convert_audio(file.filename)
         os.remove(file.filename)
-    return await transcribe_audio(audio, model_size, language, device)
+    return await transcribe_audio(audio, model_size, language, device, task)
 
 async def transcribe_audio(audio: np.ndarray, 
                            model_size: str,
                            language: Optional[str] = None, 
-                           device: DeviceType = DeviceType.cpu) -> Transcription:
+                           device: DeviceType = DeviceType.cpu,
+                           task : str = "transcribe") -> Transcription:
     
     if language == "auto":
         language = None
@@ -60,9 +63,8 @@ async def transcribe_audio(audio: np.ndarray,
     model.get_model()
     model.load()
     # Transcribe the file
-    # Transcribe the file
     start_time = time.time()
-    result = model.transcribe(audio, silent=True, language=language)
+    result = model.transcribe(audio, silent=True, language=language, task=task)
     end_time = time.time()
     result["processing_duration"] = end_time - start_time
     return result

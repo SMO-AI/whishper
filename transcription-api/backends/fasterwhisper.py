@@ -46,7 +46,7 @@ class FasterWhisperBackend(Backend):
             download_model(self.model_size, output_dir=local_model_path, local_files_only=False, cache_dir=local_model_cache)
 
     def transcribe(
-        self, input: np.ndarray, silent: bool = False, language: str = None
+        self, input: np.ndarray, silent: bool = False, language: str = None, task: str = "transcribe"
     ) -> Transcription:
         """
         Return word level transcription data.
@@ -59,6 +59,7 @@ class FasterWhisperBackend(Backend):
             beam_size=5,
             word_timestamps=True,
             language=language,
+            task=task
         )
         # ps = playback seconds
         with tqdm(

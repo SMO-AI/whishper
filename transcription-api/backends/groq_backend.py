@@ -23,7 +23,7 @@ class GroqBackend(Backend):
         # No load needed for API
         pass
 
-    def transcribe(self, input, silent: bool = False, language: str = None) -> Transcription:
+    def transcribe(self, input, silent: bool = False, language: str = None, task: str = "transcribe") -> Transcription:
         # input is typically np.ndarray from transcribe.py
         # We need to convert it to a file-like object for Groq API
         
@@ -40,10 +40,13 @@ class GroqBackend(Backend):
             "response_format": "verbose_json",
         }
         
-        if language and language != "auto":
+        if language and language != "auto" and task == "transcribe":
             params["language"] = language
 
-        completion = self.client.audio.transcriptions.create(**params)
+        if task == "translate":
+            completion = self.client.audio.translations.create(**params)
+        else:
+            completion = self.client.audio.transcriptions.create(**params)
 
         # Map Groq response to Transcription format
         segments: list[Segment] = []

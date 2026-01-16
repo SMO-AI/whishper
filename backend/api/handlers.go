@@ -85,7 +85,10 @@ func (s *Server) handlePostTranscription(c *fiber.Ctx) error {
 	transcription.ModelSize = c.FormValue("modelSize")
 	transcription.FileName = filename
 	transcription.Status = models.TranscriptionStatusPending
-	transcription.Task = "transcribe"
+	transcription.Task = c.FormValue("task")
+	if transcription.Task == "" {
+		transcription.Task = "transcribe"
+	}
 	transcription.SourceUrl = c.FormValue("sourceUrl")
 	transcription.Device = c.FormValue("device")
 	if transcription.Device != "cpu" && transcription.Device != "cuda" {
@@ -104,7 +107,7 @@ func (s *Server) handlePostTranscription(c *fiber.Ctx) error {
 	// Broadcast transcription to websocket clients
 	s.BroadcastTranscription(res)
 	s.NewTranscriptionCh <- true
-	
+
 	// Convert the transcription to JSON.
 	json, err := json.Marshal(res)
 	if err != nil {

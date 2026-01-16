@@ -2,88 +2,97 @@
 <script>
     import {createEventDispatcher} from 'svelte';
     import {deleteTranscription} from "$lib/utils.js";
+    import { fade } from 'svelte/transition';
     export let tr;
 
     const dispatch = createEventDispatcher();
     let download = () => {
-        dispatch('download', tr); // emit a custom event with the transcription as detail
+        dispatch('download', tr); 
     }
     let translate = () => {
-        dispatch('translate', tr); // emit a custom event with the transcription as detail
+        dispatch('translate', tr);
     }
+
+    // Extract date from MongoDB ID
+    $: date = tr.id ? new Date(parseInt(tr.id.substring(0, 8), 16) * 1000).toLocaleString() : 'Recent';
+    $: snippet = tr.result.text ? tr.result.text.substring(0, 150) + (tr.result.text.length > 150 ? '...' : '') : 'No content';
+    $: fileName = tr.fileName ? tr.fileName.split("_WHSHPR_")[1] : 'Unnamed';
+    $: duration = tr.result.duration ? new Date(Math.round(tr.result.duration) * 1000).toISOString().substr(11, 8) : '00:00:00';
+    $: wordCount = tr.result.text ? tr.result.text.split(/\s+/).filter(w => w.length > 0).length : 0;
 </script>
 
-<div class="alert alert-success p-3">
-    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-    <span>
-        <p class="font-bold text-info-content text-md">{tr.fileName.split("_WHSHPR_")[1]}</p>
-        <p class="font-mono text-info-content text-sm opacity-60 flex space-x-2 md:space-x-4 lg:space-x-8">
-            <span class="space-x-1">
-                <span class="font-bold text-xs">{new Date(Math.round(tr.result.duration) * 1000).toISOString().substr(11, 8)} long</span>
-            </span>
-            <span class="space-x-1">
-                <span class="font-bold text-xs">{tr.modelSize} model</span>
-            </span>
-            <span class="space-x-1">
-                <span class="font-bold text-xs uppercase">on {tr.device}</span>
-            </span>
-             <span class="space-x-1">
-                <span class="font-bold text-xs">({tr.result.language})</span>
-            </span>
-            {#if tr.result.processing_duration}
-            <span class="space-x-1">
-                <span class="font-bold text-xs">took {tr.result.processing_duration.toFixed(2)}s</span>
-            </span>
-            {/if}
-            <span class="space-x-1">
-                <span class="font-bold text-xs">{tr.translations.length} translations</span>
-            </span>
-            <span class="space-x-1">
-                <span class="font-bold text-xs">{tr.result.text.split(" ").length} words</span>
-            </span>
-        </p>
-    </span>
-    <div class="flex items-center justify-center flex-wrap space-x-2">
-        <a href="/editor/{tr.id}" class="btn btn-xs md:btn-sm">
-            <span class="tooltip flex items-center justify-center" data-tip="Edit">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <path d="M12 15l8.385 -8.415a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3z"></path>
-                    <path d="M16 5l3 3"></path>
-                    <path d="M9 7.07a7 7 0 0 0 1 13.93a7 7 0 0 0 6.929 -6"></path>
-                 </svg>
-            </span>
-        </a>
-        <button  on:click={download} onclick="modalDownloadOptions.showModal()" class="btn btn-xs md:btn-sm">
-            <span class="tooltip flex items-center justify-center" data-tip="Download">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path>
-                    <path d="M7 11l5 5l5 -5"></path>
-                    <path d="M12 4l0 12"></path>
-                 </svg>
-            </span>
-        </button>
-        <button on:click={translate} class="btn btn-xs md:btn-sm btn-primary">
-            <span class="tooltip flex items-center justify-center" data-tip="Translate">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <path d="M4 5h7"></path>
-                    <path d="M7 4c0 4.846 0 7 .5 8"></path>
-                    <path d="M10 8.5c0 2.286 -2 4.5 -3.5 4.5s-2.5 -1.135 -2.5 -2c0 -2 1 -3 3 -3s5 .57 5 2.857c0 1.524 -.667 2.571 -2 3.143"></path>
-                    <path d="M12 20l4 -9l4 9"></path>
-                    <path d="M19.1 18h-6.2"></path>
+<div class="group relative bg-base-200/50 hover:bg-base-200 border border-base-300 hover:border-primary/30 rounded-2xl p-5 md:p-6 transition-all duration-300 shadow-sm hover:shadow-xl mt-4" in:fade>
+    <!-- Left glow effect on hover -->
+    <div class="absolute inset-y-0 left-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform duration-300 rounded-l-2xl"></div>
+
+    <div class="flex flex-col md:flex-row gap-6">
+        <!-- Visual Column -->
+        <div class="hidden md:flex flex-col items-center justify-center bg-base-300/50 rounded-xl p-4 min-w-[100px] border border-base-content/5 group-hover:border-primary/20 transition-colors">
+            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
                 </svg>
-            </span>
-        </button>
-        <button on:click={deleteTranscription(tr.id)} class="btn btn-xs md:btn-sm btn-error">
-            <span class="tooltip flex items-center justify-center" data-tip="Delete">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <path d="M20 6a1 1 0 0 1 .117 1.993l-.117 .007h-.081l-.919 11a3 3 0 0 1 -2.824 2.995l-.176 .005h-8c-1.598 0 -2.904 -1.249 -2.992 -2.75l-.005 -.167l-.923 -11.083h-.08a1 1 0 0 1 -.117 -1.993l.117 -.007h16zm-9.489 5.14a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" stroke-width="0" fill="currentColor"></path>
-                    <path d="M14 2a2 2 0 0 1 2 2a1 1 0 0 1 -1.993 .117l-.007 -.117h-4l-.007 .117a1 1 0 0 1 -1.993 -.117a2 2 0 0 1 1.85 -1.995l.15 -.005h4z" stroke-width="0" fill="currentColor"></path>
-                </svg>
-            </span>
-        </button>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider opacity-60">{duration}</span>
+        </div>
+
+        <!-- Content Column -->
+        <div class="flex-1 flex flex-col justify-between space-y-3">
+            <div>
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                    <h3 class="text-lg font-bold text-base-content group-hover:text-primary transition-colors truncate max-w-md">
+                        {fileName}
+                    </h3>
+                    <div class="flex flex-wrap gap-2">
+                        <div class="badge badge-outline badge-sm opacity-70 group-hover:opacity-100 transition-opacity uppercase font-mono text-[10px]">{tr.modelSize}</div>
+                        <div class="badge badge-primary badge-sm font-bold uppercase text-[10px] tracking-tight">{tr.task || 'transcribe'}</div>
+                        <div class="badge badge-ghost badge-sm font-mono text-[10px]">{tr.result.language}</div>
+                    </div>
+                </div>
+
+                <p class="text-sm text-base-content/70 italic line-clamp-2 md:line-clamp-3 mb-3 leading-relaxed">
+                    "{snippet}"
+                </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-medium opacity-60">
+                <div class="flex items-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    {date}
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    {wordCount} words
+                </div>
+                {#if tr.result.processing_duration}
+                <div class="flex items-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    took {tr.result.processing_duration.toFixed(1)}s
+                </div>
+                {/if}
+            </div>
+        </div>
+
+        <!-- Action Column -->
+        <div class="flex md:flex-col items-center justify-center gap-2 border-t md:border-t-0 md:border-l border-base-content/10 pt-4 md:pt-0 md:pl-6 min-w-[60px]">
+            <a href="/editor/{tr.id}" class="btn btn-square btn-ghost btn-sm hover:bg-primary hover:text-primary-content transition-all" title="Edit">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            </a>
+            
+            <button on:click={download} onclick="modalDownloadOptions.showModal()" class="btn btn-square btn-ghost btn-sm hover:bg-secondary hover:text-secondary-content transition-all" title="Download">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            </button>
+
+            <button on:click={translate} class="btn btn-square btn-ghost btn-sm hover:bg-accent hover:text-accent-content transition-all" title="Translate">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"></path><path d="m4 14 6-6 2-3"></path><path d="M2 5h12"></path><path d="M7 2h1"></path><path d="m22 22-5-10-5 10"></path><path d="M14 18h6"></path></svg>
+            </button>
+
+            <button on:click={deleteTranscription(tr.id)} class="btn btn-square btn-ghost btn-sm hover:bg-error hover:text-error-content transition-all text-error/60" title="Delete">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            </button>
+        </div>
     </div>
 </div>

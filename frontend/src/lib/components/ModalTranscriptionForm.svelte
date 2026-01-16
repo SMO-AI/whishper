@@ -12,6 +12,7 @@
 	let sourceUrl = '';
 	let fileInput;
 	let device = env.PUBLIC_WHISHPER_PROFILE == 'gpu' ? 'cuda' : 'cpu';
+	let task = 'transcribe';
 
 	let languages = [
 		'auto',
@@ -78,6 +79,7 @@
 		let formData = new FormData();
 		formData.append('language', language);
 		formData.append('modelSize', modelSize);
+		formData.append('task', task);
 		if (device == 'cuda' || device == 'cpu') {
 			formData.append('device', device);
 		} else {
@@ -225,6 +227,25 @@
 						<option disabled value="cuda">GPU</option>
 					{/if}
 				</select>
+			</div>
+		</div>
+
+		<div class="flex space-x-4 mt-2">
+			<div class="w-full max-w-xs form-control">
+				<label for="task" class="label">
+					<span class="label-text text-xs uppercase font-bold opacity-60">Task</span>
+				</label>
+				<select name="task" bind:value={task} class="select select-sm select-bordered text-sm">
+					<option value="transcribe">Transcribe (Any to Any)</option>
+					<option value="translate">Translate (Any to English)</option>
+				</select>
+			</div>
+			<div class="w-full max-w-xs flex flex-col justify-end">
+				{#if task === 'translate'}
+					<span class="text-[10px] text-info italic mb-2">
+						* Whisper translation only supports translating any language to English.
+					</span>
+				{/if}
 			</div>
 		</div>
 

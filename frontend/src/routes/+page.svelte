@@ -45,20 +45,20 @@
 		};
 
 		socket.onmessage = (event) => {
-            let update = JSON.parse(event.data);
-            // use update to update the store
-            transcriptions.update(transcriptions => {
-                let index = transcriptions.findIndex(tr => tr.id === update.id);
-                if (index >= 0) {
-                    // replace the item at index
-                    transcriptions[index] = update;
-                } else {
-                    // add the new item
-                    transcriptions.push(update);
-                }
-                return transcriptions; // return a new object to trigger reactivity
-            });
-        };
+			let update = JSON.parse(event.data);
+			// use update to update the store
+			transcriptions.update((transcriptions) => {
+				let index = transcriptions.findIndex((tr) => tr.id === update.id);
+				if (index >= 0) {
+					// replace the item at index
+					transcriptions[index] = update;
+				} else {
+					// add the new item
+					transcriptions.push(update);
+				}
+				return transcriptions; // return a new object to trigger reactivity
+			});
+		};
 	}
 
 	onMount(() => {
@@ -88,46 +88,109 @@
 <ModalTranslationForm tr={translateTranscription} />
 <ModalTranscriptionForm />
 
-<header>
-	<h1 class="flex items-center justify-center mt-8 space-x-4 text-4xl font-bold">
-		<span>
-			<img class="w-20 h-20" src="/logo.svg" alt="Logo: a cloud whispering" />
-		</span>
-		<span> Whishper </span>
-	</h1>
-	<h2 class="font-mono text-center text-md opacity-70">{data.randomSentence}</h2>
+<header class="py-12 bg-gradient-to-b from-base-300/50 to-transparent">
+	<div class="flex flex-col items-center justify-center space-y-4">
+		<div class="relative group">
+			<div
+				class="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"
+			></div>
+			<img class="relative w-24 h-24" src="/logo.svg" alt="Logo: a cloud whispering" />
+		</div>
+		<h1
+			class="text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary"
+		>
+			Whishper
+		</h1>
+		<h2 class="font-mono text-center text-md opacity-60 max-w-md italic leading-relaxed px-4">
+			"{data.randomSentence}"
+		</h2>
+	</div>
 </header>
 
-<main class="w-4/6 mx-auto mt-4 mb-8 card bg-neutral text-neutral-content">
-	{#if $uploadProgress > 0}
-		<div class="flex flex-col items-center justify-center px-4 pt-4 my-4">
-			<progress class="w-full mx-2 progress progress-success" value="{$uploadProgress}" max="100"></progress>
-			<span>Uploading...</span>
-		</div>
-	{:else}
-		<button
-			class="max-w-md mx-auto mt-8 btn btn-primary btn-md"
-			onclick="modalNewTranscription.showModal()">✨ new transcription</button
+<main class="w-full max-w-5xl mx-auto px-4 mb-24">
+	<div
+		class="bg-base-200/50 backdrop-blur-sm rounded-3xl border border-base-300 p-6 md:p-8 shadow-2xl"
+	>
+		<div
+			class="flex flex-col md:flex-row items-center justify-between gap-6 mb-8 pb-8 border-b border-base-content/10"
 		>
-	{/if}
-	<div class="items-center mb-0 text-center card-body">
-		{#if $transcriptions.length > 0}
-			{#each $transcriptions.slice().reverse() as tr (tr.id)}
-				{#if tr.status == 2}
-					<SuccessTranscription {tr} on:download={handleDownload} on:translate={handleTranslate} />
+			<div class="text-center md:text-left">
+				<h3 class="text-2xl font-bold tracking-tight">Your Library</h3>
+				<p class="text-sm opacity-60">Manage and explore your transcriptions</p>
+			</div>
+
+			<div class="flex items-center gap-4">
+				{#if $uploadProgress > 0}
+					<div class="flex flex-col items-end min-w-[200px]">
+						<progress class="progress progress-primary w-full h-3" value={$uploadProgress} max="100"
+						></progress>
+						<span
+							class="text-[10px] uppercase font-bold tracking-widest mt-1 opacity-60 animate-pulse"
+							>Uploading {$uploadProgress}%</span
+						>
+					</div>
+				{:else}
+					<button
+						class="btn btn-primary btn-md md:btn-lg px-8 rounded-2xl shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all font-bold group"
+						onclick="modalNewTranscription.showModal()"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="3"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"
+							></line></svg
+						>
+						✨ New Transcription
+					</button>
 				{/if}
-				{#if tr.status < 2 && tr.status >= 0}
-					<PendingTranscription {tr} />
-				{/if}
-				{#if tr.status == 3}
-					<PendingTranslation {tr} />
-				{/if}
-				{#if tr.status < 0}
-					<ErrorTranscription {tr} />
-				{/if}
-			{/each}
-		{:else}
-			<p class="text-2xl font-bold text-center">🔮 No transcriptions yet 🔮</p>
-		{/if}
+			</div>
+		</div>
+
+		<div class="flex flex-col space-y-1">
+			{#if $transcriptions.length > 0}
+				{#each $transcriptions.slice().reverse() as tr (tr.id)}
+					{#if tr.status == 2}
+						<SuccessTranscription
+							{tr}
+							on:download={handleDownload}
+							on:translate={handleTranslate}
+						/>
+					{/if}
+					{#if tr.status < 2 && tr.status >= 0}
+						<PendingTranscription {tr} />
+					{/if}
+					{#if tr.status == 3}
+						<PendingTranslation {tr} />
+					{/if}
+					{#if tr.status < 0}
+						<ErrorTranscription {tr} />
+					{/if}
+				{/each}
+			{:else}
+				<div class="py-20 flex flex-col items-center justify-center opacity-40">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="w-24 h-24 mb-4"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="1"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg
+					>
+					<p class="text-2xl font-bold text-center tracking-tight italic">
+						Your collection is empty
+					</p>
+					<p class="text-sm">Start by uploading your first audio file</p>
+				</div>
+			{/if}
+		</div>
 	</div>
 </main>

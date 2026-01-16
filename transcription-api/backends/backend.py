@@ -62,7 +62,7 @@ class Backend:
     def load(self):
         raise NotImplementedError()
 
-    def transcribe(self, input: np.ndarray) -> list[Segment]:
+    def transcribe(self, input: np.ndarray, silent: bool = False, language: str = None, task: str = "transcribe") -> Transcription:
         """
         This should return word level transcription data.
         """
