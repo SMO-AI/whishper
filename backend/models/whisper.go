@@ -2,8 +2,9 @@ package models
 
 type WhisperResult struct {
 	Language string    `json:"language"`
-	Duration float64   `json:"duration"`
-	Segments []Segment `json:"segments"`
+	Duration           float64   `json:"duration"`
+	ProcessingDuration float64   `json:"processing_duration"`
+	Segments           []Segment `json:"segments"`
 	Text     string    `json:"text"`
 }
 

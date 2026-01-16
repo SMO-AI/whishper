@@ -27,6 +27,7 @@ Transcription = TypedDict(
         "text": str,
         "language": str,
         "duration": float,
+        "processing_duration": float,
         "segments": list[Segment],
     },
 )

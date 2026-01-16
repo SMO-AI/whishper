@@ -22,6 +22,20 @@
                 <span class="font-bold text-xs">{new Date(Math.round(tr.result.duration) * 1000).toISOString().substr(11, 8)} long</span>
             </span>
             <span class="space-x-1">
+                <span class="font-bold text-xs">{tr.modelSize} model</span>
+            </span>
+            <span class="space-x-1">
+                <span class="font-bold text-xs uppercase">on {tr.device}</span>
+            </span>
+             <span class="space-x-1">
+                <span class="font-bold text-xs">({tr.result.language})</span>
+            </span>
+            {#if tr.result.processing_duration}
+            <span class="space-x-1">
+                <span class="font-bold text-xs">took {tr.result.processing_duration.toFixed(2)}s</span>
+            </span>
+            {/if}
+            <span class="space-x-1">
                 <span class="font-bold text-xs">{tr.translations.length} translations</span>
             </span>
             <span class="space-x-1">

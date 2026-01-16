@@ -6,6 +6,7 @@ from typing import Optional
 import numpy as np
 import io
 import os
+import time
 
 def convert_audio(file) -> np.ndarray:
         return decode_audio(file, split_stereo=False, sampling_rate=16000)
@@ -53,4 +54,9 @@ async def transcribe_audio(audio: np.ndarray,
     model.get_model()
     model.load()
     # Transcribe the file
-    return model.transcribe(audio, silent=True, language=language)
+    # Transcribe the file
+    start_time = time.time()
+    result = model.transcribe(audio, silent=True, language=language)
+    end_time = time.time()
+    result["processing_duration"] = end_time - start_time
+    return result
