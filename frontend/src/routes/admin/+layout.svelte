@@ -18,7 +18,7 @@
 
 		// Check Admin Status
 		const { data: profile, error } = await supabase
-			.from('profiles')
+			.from('whishper_profiles')
 			.select('role')
 			.eq('id', session.user.id)
 			.single();

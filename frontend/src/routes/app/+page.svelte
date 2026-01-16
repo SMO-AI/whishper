@@ -11,6 +11,7 @@
 	import PendingTranscription from '$lib/components/PendingTranscription.svelte';
 	import PendingTranslation from '$lib/components/PendingTranslation.svelte';
 	import ErrorTranscription from '$lib/components/ErrorTranscription.svelte';
+	import ModalSubscription from '$lib/components/ModalSubscription.svelte';
 	import { theme } from '$lib/stores';
 
 	import { supabase } from '$lib/supabase';
@@ -101,12 +102,14 @@
 			socket.close(1000);
 		}
 	});
+	let modalSubscription;
 </script>
 
 <Toaster />
 <ModalDownloadOptions tr={downloadTranscription} />
 <ModalTranslationForm tr={translateTranscription} />
 <ModalTranscriptionForm />
+<ModalSubscription bind:this={modalSubscription} />
 
 <header class="py-12 bg-gradient-to-b from-primary/5 to-transparent relative">
 	<div class="absolute top-4 right-4 md:top-8 md:right-8 flex items-center gap-2">
@@ -175,7 +178,7 @@
 					</button>
 				</li>
 				<li><button>Settings</button></li>
-				<li><button>Check Subscription</button></li>
+				<li><button on:click={() => modalSubscription.showModal()}>Check Subscription</button></li>
 				<div class="divider my-0" />
 				<li>
 					<button class="text-error font-medium hover:bg-error/10" on:click={handleLogout}
