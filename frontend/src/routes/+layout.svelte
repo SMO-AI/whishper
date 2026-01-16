@@ -18,10 +18,10 @@
 		} else {
 			// Check and update user metadata if needed (fixes Google Auth profile creation)
 			const appMetadata = session.user.user_metadata.app;
-			if (appMetadata !== 'whishper') {
+			if (appMetadata !== 'scriptus') {
 				console.log('App metadata missing or incorrect, updating...');
 				await supabase.auth.updateUser({
-					data: { app: 'whishper' }
+					data: { app: 'scriptus' }
 				});
 			}
 

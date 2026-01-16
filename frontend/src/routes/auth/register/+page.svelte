@@ -25,7 +25,7 @@
 				password,
 				options: {
 					data: {
-						app: 'whishper'
+						app: 'scriptus'
 					},
 					emailRedirectTo: window.location.origin + '/app'
 				}
@@ -66,7 +66,7 @@
 			>
 				Create Account
 			</h2>
-			<p class="opacity-60">Start your journey with Whishper</p>
+			<p class="opacity-60">Start your journey with Scriptus</p>
 		</div>
 
 		<div class="form-control w-full">

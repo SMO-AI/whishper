@@ -51,11 +51,11 @@ func ValidateToken(token string) (*SupabaseUser, error) {
 	return &user, nil
 }
 
-func CheckUserActive(token string) (bool, error) {
+func CheckUserActive(token string, userID string) (bool, error) {
 	supabaseUrl := os.Getenv("SUPABASE_URL")
 	apiKey := os.Getenv("SUPABASE_ANON_KEY")
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/rest/v1/whishper_profiles?select=status", supabaseUrl), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/rest/v1/whishper_profiles?select=status&id=eq.%s", supabaseUrl, userID), nil)
 	if err != nil {
 		return false, err
 	}

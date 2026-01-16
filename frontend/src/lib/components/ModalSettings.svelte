@@ -14,7 +14,8 @@
 	let profile = {
 		full_name: '',
 		avatar_url: '',
-		email: ''
+		email: '',
+		bio: ''
 	};
 	let newPassword = '';
 	let avatarFile;
@@ -32,16 +33,46 @@
 		} = await supabase.auth.getSession();
 		if (session) {
 			profile.email = session.user.email;
-			profile.full_name = session.user.user_metadata.full_name || '';
-			profile.avatar_url = session.user.user_metadata.avatar_url || '';
+			// Try to fetch from whishper_profiles first
+			const { data: dbProfile, error } = await supabase
+				.from('whishper_profiles')
+				.select('*')
+				.eq('id', session.user.id)
+				.single();
+
+			if (dbProfile) {
+				profile.full_name = dbProfile.name || session.user.user_metadata.full_name || '';
+				profile.avatar_url = dbProfile.avatar_image || session.user.user_metadata.avatar_url || '';
+				profile.bio = dbProfile.bio || '';
+				// Sync email if different? Usually auth email is source of truth.
+				profile.email = session.user.email;
+			} else {
+				// Fallback to auth metadata
+				profile.full_name = session.user.user_metadata.full_name || '';
+				profile.avatar_url = session.user.user_metadata.avatar_url || '';
+				profile.bio = '';
+			}
 		}
 	}
 
 	async function updateProfile() {
 		loading = true;
 		try {
+			const {
+				data: { session }
+			} = await supabase.auth.getSession();
+			if (!session) throw new Error('No session');
+
 			const updates = {
 				full_name: profile.full_name,
+				updated_at: new Date()
+			};
+
+			// Updates for whishper_profiles table
+			const dbUpdates = {
+				name: profile.full_name,
+				bio: profile.bio,
+				email: session.user.email, // Ensure email is synced
 				updated_at: new Date()
 			};
 
@@ -59,14 +90,24 @@
 				} = supabase.storage.from('avatars').getPublicUrl(fileName);
 
 				updates.avatar_url = publicUrl;
+				dbUpdates.avatar_image = publicUrl;
 			}
 
+			// 1. Update Supabase Auth Table (Metadata)
 			const { error } = await supabase.auth.updateUser({
 				data: updates
 			});
-
 			if (error) throw error;
 
+			// 2. Update whishper_profiles Table
+			const { error: dbError } = await supabase
+				.from('whishper_profiles')
+				.update(dbUpdates)
+				.eq('id', session.user.id);
+
+			if (dbError) throw dbError;
+
+			// 3. Update Password if provided
 			if (newPassword) {
 				const { error: pwdError } = await supabase.auth.updateUser({
 					password: newPassword
@@ -77,6 +118,7 @@
 			toast.success($t('success_profile_updated'));
 			document.getElementById('modal_settings').close();
 		} catch (error) {
+			console.error(error);
 			toast.error(error.message);
 		} finally {
 			loading = false;
@@ -217,12 +259,35 @@
 						<!-- Form -->
 						<div class="form-control w-full">
 							<label class="label">
+								<span class="label-text">{$t('email')}</span>
+							</label>
+							<input
+								type="text"
+								value={profile.email}
+								readonly
+								class="input input-bordered w-full opacity-60 cursor-not-allowed"
+							/>
+						</div>
+
+						<div class="form-control w-full">
+							<label class="label">
 								<span class="label-text">{$t('full_name')}</span>
 							</label>
 							<input
 								type="text"
 								bind:value={profile.full_name}
 								class="input input-bordered w-full"
+							/>
+						</div>
+
+						<div class="form-control w-full">
+							<label class="label">
+								<span class="label-text">{$t('bio')}</span>
+							</label>
+							<textarea
+								bind:value={profile.bio}
+								class="textarea textarea-bordered h-24"
+								placeholder={$t('bio_placeholder')}
 							/>
 						</div>
 

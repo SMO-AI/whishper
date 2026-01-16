@@ -77,7 +77,7 @@
 			window.URL.revokeObjectURL(url);
 		} catch (error) {
 			console.error(error);
-			toast.error('Failed to download media');
+			toast.error($t('error_media_download_failed'));
 		}
 	}
 
@@ -99,7 +99,7 @@
 		try {
 			await navigator.clipboard.writeText(text);
 			console.log('Text copied to clipboard');
-			toast.success('Text copied to clipboard');
+			toast.success($t('success_copy'));
 		} catch (err) {
 			console.error('Error in copying text: ', err);
 		}
@@ -110,12 +110,12 @@
 	<form method="dialog" class="modal-box flex flex-col items-center justify-center">
 		<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
 		{#if tr}
-			<h1 class="text-center font-bold mt-2 pb-2">Download Options</h1>
+			<h1 class="text-center font-bold mt-2 pb-2">{$t('download_options')}</h1>
 
 			<div class="flex flex-row space-x-4">
 				<div class="form-control">
 					<label for="format" class="label">
-						<span class="label-text font-bold">File Format</span>
+						<span class="label-text font-bold">{$t('file_format')}</span>
 					</label>
 					<select
 						bind:value={subtitleFormat}
@@ -131,14 +131,14 @@
 
 				<div class="form-control">
 					<label for="language" class="label">
-						<span class="label-text font-bold">Text Language</span>
+						<span class="label-text font-bold">{$t('text_language')}</span>
 					</label>
 					<select
 						bind:value={language}
 						name="language"
 						class="select select-bordered w-full max-w-xs uppercase"
 					>
-						<option value="original">✅ {tr.result.language}</option>
+						<option value="original">✅ {$t('original')} ({tr.result.language})</option>
 						{#each tr.translations as translation}
 							<option value={translation.targetLanguage}>🤖 {translation.targetLanguage}</option>
 						{/each}

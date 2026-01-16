@@ -269,8 +269,8 @@
 					class="font-mono font-bold px-1.5 py-0.5 rounded text-[10px] {getCps(segment) > 20
 						? 'bg-error text-error-content'
 						: getCps(segment) > 16
-							? 'bg-warning text-warning-content'
-							: 'bg-success/20 text-success'}"
+						? 'bg-warning text-warning-content'
+						: 'bg-success/20 text-success'}"
 				>
 					{getCps(segment)}
 				</span>
@@ -282,7 +282,7 @@
 					class="progress progress-primary w-full h-1 opacity-20"
 					value={segment.end - segment.start}
 					max="10"
-				></progress>
+				/>
 			{/if}
 		</div>
 	</td>
@@ -355,7 +355,7 @@
 				>
 			</button>
 
-			<div class="divider my-1 h-px bg-base-content/5 w-full"></div>
+			<div class="divider my-1 h-px bg-base-content/5 w-full" />
 
 			<!-- Delete -->
 			<button

@@ -18,10 +18,10 @@ export const uploadProgress = writable(0);
 
 // editor settings
 export let editorSettings = writable({
-    autosave: false,
-    autosaveInterval: 30000,
-    autosaveNotify: true,
-    seekOnClick: true,
+	autosave: false,
+	autosaveInterval: 30000,
+	autosaveNotify: true,
+	seekOnClick: true
 });
 
 // Video player settings
@@ -29,7 +29,7 @@ export let editorSettings = writable({
 export const currentVideoPlayerTime = writable(0);
 
 // App Theme
-export const theme = writable("light");
+export const theme = writable('light');
 
 // Locale
-export const locale = writable("ru");
+export const locale = writable('ru');

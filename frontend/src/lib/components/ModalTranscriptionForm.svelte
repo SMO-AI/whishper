@@ -3,12 +3,12 @@
 	import { env } from '$env/dynamic/public';
 	import { uploadProgress } from '$lib/stores';
 	import { supabase } from '$lib/supabase'; // Import Supabase
+	import { tick } from 'svelte';
 
 	import toast from 'svelte-french-toast';
 
-	let errorMessage = '';
 	let disableSubmit = true;
-	let modelSize = 'groq:whisper-large-v3'; // Default to Groq V3 as requested
+	let modelSize = 'groq:whisper-large-v3-turbo'; // Default to Groq V3 Turbo as requested
 	let language = 'auto';
 	let sourceUrl = '';
 	let fileInput;
@@ -76,22 +76,26 @@
 
 			// Set up load event listener
 			xhr.addEventListener('load', () => {
+				uploadProgress.set(0); // Reset progress after completion
 				if (xhr.status === 200) {
 					resolve(xhr.response);
 					toast.success('Success!');
+					// Cleanup
+					sourceUrl = '';
+					if (fileInput) fileInput.value = '';
+					fileName = '';
 					// Close the modal programmatically
 					document.getElementById('modalNewTranscription').close();
 				} else {
 					reject(xhr.statusText);
 					toast.error('Upload failed');
 				}
-				uploadProgress.set(0); // Reset progress after completion
 			});
 
 			// Set up error event listener
 			xhr.addEventListener('error', () => {
 				reject(xhr.statusText);
-				toast.error('An error occurred during upload');
+				toast.error($t('upload_error'));
 				uploadProgress.set(0); // Reset progress on error
 			});
 
@@ -101,33 +105,18 @@
 			}
 			xhr.send(formData);
 		});
-
-		// Set file and sourceUrl to empty
-		sourceUrl = '';
-		if (fileInput) fileInput.value = '';
-		uploadProgress.set(0);
-
-		toast.success('Success!');
 	}
 
 	// Reactive statement
-	$: if (sourceUrl && !validateURL(sourceUrl)) {
-		errorMessage = 'Enter a valid URL';
-		disableSubmit = true;
-	} else {
-		errorMessage = '';
+	$: {
 		// Check invalid state more thoroughly
-		if (activeTab === 'url' && (!sourceUrl || !validateURL(sourceUrl))) {
-			disableSubmit = true;
+		if (activeTab === 'url') {
+			disableSubmit = true; // URL import is disabled for now
 		} else if (
 			activeTab === 'file' &&
 			(!fileInput || !fileInput.files || fileInput.files.length === 0)
 		) {
-			// We can't really reactively track file input changes easily without binding event
-			// But valid URL logic handles the URL part.
-			// For file input, we usually rely on the user picking something.
-			// Let's assume false if no error for now, but button click will validate.
-			disableSubmit = false;
+			disableSubmit = true;
 		} else {
 			disableSubmit = false;
 		}
@@ -156,8 +145,8 @@
 			class="bg-base-200/50 p-6 border-b border-base-content/5 flex justify-between items-center"
 		>
 			<div>
-				<h3 class="font-bold text-2xl">New Transcription</h3>
-				<p class="text-sm opacity-60">Upload audio or video to transcribe</p>
+				<h3 class="font-bold text-2xl">{$t('new_transcription_title')}</h3>
+				<p class="text-sm opacity-60">{$t('new_transcription_desc')}</p>
 			</div>
 			<button class="btn btn-circle btn-ghost btn-sm">✕</button>
 		</div>
@@ -171,9 +160,11 @@
 					class="tab transition-all duration-300 rounded-lg {activeTab === 'file'
 						? 'tab-active bg-primary text-primary-content shadow-md'
 						: ''}"
-					on:click={() => {
+					on:click={async () => {
 						activeTab = 'file';
 						sourceUrl = '';
+						await tick();
+						if (fileInput) fileInput.click();
 					}}
 				>
 					<svg
@@ -189,7 +180,7 @@
 							d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
 						/></svg
 					>
-					Upload File
+					{$t('upload_file')}
 				</button>
 				<button
 					type="button"
@@ -216,7 +207,7 @@
 							d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
 						/></svg
 					>
-					Import from URL
+					{$t('import_url')}
 				</button>
 			</div>
 
@@ -280,12 +271,32 @@
 						</label>
 					</div>
 				{:else}
-					<div class="form-control w-full">
-						<label class="label">
+					<div class="alert alert-info shadow-sm bg-base-200/50 border-base-content/10 mb-4">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							class="stroke-current shrink-0 w-6 h-6"
+							><path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+							/></svg
+						>
+						<div>
+							<h3 class="font-bold">Coming Soon</h3>
+							<div class="text-xs">Import from URL is currently in development.</div>
+						</div>
+					</div>
+					<div class="form-control w-full opacity-50 pointer-events-none">
+						<label class="label" for="url-input">
 							<span class="label-text font-bold">Paste URL</span>
 						</label>
 						<div class="relative">
 							<input
+								disabled
+								id="url-input"
 								name="sourceUrl"
 								bind:value={sourceUrl}
 								type="text"
@@ -310,15 +321,6 @@
 								>
 							</div>
 						</div>
-						<label class="label">
-							{#if errorMessage}
-								<span class="label-text-alt text-error">{errorMessage}</span>
-							{:else}
-								<span class="label-text-alt opacity-50"
-									>Supported: YouTube, generic video/audio URLs</span
-								>
-							{/if}
-						</label>
 					</div>
 				{/if}
 			</div>
@@ -326,10 +328,15 @@
 			<!-- Configuration Grid -->
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-base-content/10">
 				<div class="form-control w-full">
-					<label class="label">
+					<label class="label" for="model-select">
 						<span class="label-text font-bold text-sm">Model</span>
 					</label>
-					<select name="modelSize" bind:value={modelSize} class="select select-bordered w-full">
+					<select
+						id="model-select"
+						name="modelSize"
+						bind:value={modelSize}
+						class="select select-bordered w-full"
+					>
 						{#each models as m}
 							<option value={m.value}>{m.label}</option>
 						{/each}
@@ -337,10 +344,15 @@
 				</div>
 
 				<div class="form-control w-full">
-					<label class="label">
+					<label class="label" for="language-select">
 						<span class="label-text font-bold text-sm">Language</span>
 					</label>
-					<select name="language" bind:value={language} class="select select-bordered w-full">
+					<select
+						id="language-select"
+						name="language"
+						bind:value={language}
+						class="select select-bordered w-full"
+					>
 						{#each languages as l}
 							<option value={l.value}>{l.label}</option>
 						{/each}

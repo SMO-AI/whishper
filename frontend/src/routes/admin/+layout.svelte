@@ -45,7 +45,7 @@
 		<div class="navbar bg-base-100 shadow px-6">
 			<div class="flex-1">
 				<a class="btn btn-ghost normal-case text-xl font-bold text-primary" href="/admin"
-					>Whishper Admin</a
+					>Scriptus Admin</a
 				>
 			</div>
 			<div class="flex-none gap-4">

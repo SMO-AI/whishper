@@ -160,7 +160,7 @@
 
 {#if $currentTranscription.status != 2}
 	<div class="flex items-center justify-center">
-		<span class="loading loading-spinner loading-lg"></span>
+		<span class="loading loading-spinner loading-lg" />
 		<p class="text-center">
 			Waiting for task to finish {$currentTranscription.status == 3
 				? 'translating'
@@ -224,10 +224,9 @@
 								stroke-width="2"
 								stroke-linecap="round"
 								stroke-linejoin="round"
-								><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
-								></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline
-									points="7 3 7 8 15 8"
-								></polyline></svg
+								><path
+									d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+								/><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" /></svg
 							>
 							<span class="hidden md:inline">Save Changes</span>
 						</button>
@@ -244,8 +243,10 @@
 							name="language"
 							class="select select-xs select-bordered max-w-xs font-mono uppercase bg-base-200/50 focus:bg-base-100 transition-all"
 						>
-							<option value="original">✅ {$currentTranscription.result.language}</option>
-							{#each $currentTranscription.translations as translation}
+							<option value="original"
+								>✅ {$t('original')} ({$currentTranscription.result.language})</option
+							>
+							{#each $currentTranscription.translations as translation, translationIndex}
 								<option value={translation.targetLanguage}>🤖 {translation.targetLanguage}</option>
 							{/each}
 						</select>
@@ -261,10 +262,10 @@
 					<thead>
 						<tr class="text-base-content/40 text-[10px] uppercase font-bold tracking-wider">
 							<th class="bg-transparent pl-4 border-b-0 hidden md:table-cell">#</th>
-							<th class="bg-transparent border-b-0">Timing (s)</th>
-							<th class="bg-transparent w-full border-b-0">Transcription</th>
-							<th class="bg-transparent border-b-0 hidden md:table-cell">Metrics</th>
-							<th class="bg-transparent pr-4 text-right border-b-0">Actions</th>
+							<th class="bg-transparent border-b-0">{$t('timing')}</th>
+							<th class="bg-transparent w-full border-b-0">{$t('transcribe')}</th>
+							<th class="bg-transparent border-b-0 hidden md:table-cell">{$t('metrics')}</th>
+							<th class="bg-transparent pr-4 text-right border-b-0">{$t('actions')}</th>
 						</tr>
 					</thead>
 					<tbody class="text-sm">
@@ -292,14 +293,14 @@
 					>
 						{#if $language == 'original'}
 							{#if segmentsToShow >= $currentTranscription.result.segments.length}
-								<span class="text-xs italic">End of transcription</span>
+								<span class="text-xs italic">{$t('end_transcription')}</span>
 							{:else}
-								<span class="loading loading-dots loading-xs"></span>
+								<span class="loading loading-dots loading-xs" />
 							{/if}
 						{:else if segmentsToShow >= $currentTranscription.translations.filter((translation) => translation.targetLanguage == $language)[0].result.segments.length}
-							<span class="text-xs italic">End of transcription</span>
+							<span class="text-xs italic">{$t('end_transcription')}</span>
 						{:else}
-							<span class="loading loading-dots loading-xs"></span>
+							<span class="loading loading-dots loading-xs" />
 						{/if}
 					</button>
 				</div>

@@ -16,7 +16,7 @@
 			<div
 				class="w-12 h-12 rounded-full bg-info/10 flex items-center justify-center text-info mb-2"
 			>
-				<span class="loading loading-ring loading-md"></span>
+				<span class="loading loading-ring loading-md" />
 			</div>
 			<span class="text-[10px] font-bold uppercase tracking-wider opacity-60 italic"
 				>Processing</span

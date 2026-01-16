@@ -26,6 +26,16 @@ func (s *Server) handleGetAllTranscriptions(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
 	}
 
+	// Check if user is active
+	active, err := CheckUserActive(token, user.ID)
+	if err != nil {
+		log.Error().Err(err).Msg("Error checking user active status")
+		return fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+	if !active {
+		return fiber.NewError(fiber.StatusForbidden, "Subscription required")
+	}
+
 	transcriptions := s.Db.GetAllTranscriptions(user.ID)
 
 	// Convert the transcriptions to JSON.
@@ -97,7 +107,7 @@ func (s *Server) handlePostTranscription(c *fiber.Ctx) error {
 	}
 
 	// Check if user is active
-	active, err := CheckUserActive(token)
+	active, err := CheckUserActive(token, user.ID)
 	if err != nil {
 		log.Error().Err(err).Msg("Error checking user active status")
 		return fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")

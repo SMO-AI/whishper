@@ -37,7 +37,7 @@
 			</div>
 			<span
 				class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary"
-				>Whishper</span
+				>Scriptus</span
 			>
 		</div>
 		<div class="flex items-center gap-4">

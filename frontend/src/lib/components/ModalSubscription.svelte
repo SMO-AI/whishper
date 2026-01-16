@@ -58,7 +58,7 @@
 			<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
 		</form>
 
-		<h3 class="font-bold text-lg mb-4">Subscription Status</h3>
+		<h3 class="font-bold text-lg mb-4">{$t('sub_status')}</h3>
 
 		{#if status === 'active'}
 			<div class="alert alert-success">
@@ -74,24 +74,23 @@
 						d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
 					/></svg
 				>
-				<span>You are an <strong>Active</strong> Subscriber! Unlimited Access Granted.</span>
+				<span>{$t('sub_active')}</span>
 			</div>
 		{:else}
 			<div class="alert alert-warning mb-4">
-				<span>Status: <strong>Passive</strong> (Demo Mode)</span>
+				<span>{$t('sub_passive')}</span>
 			</div>
 			<p class="mb-4 text-sm opacity-70">
-				Service is currently in demo testing mode. Please enter your secret code to activate full
-				access.
+				{$t('sub_demo_msg')}
 			</p>
 
 			<div class="form-control w-full">
 				<label class="label">
-					<span class="label-text">Activation Code</span>
+					<span class="label-text">{$t('activation_code')}</span>
 				</label>
 				<input
 					type="text"
-					placeholder="Enter code..."
+					placeholder={$t('enter_code')}
 					class="input input-bordered w-full"
 					bind:value={code}
 				/>
@@ -102,7 +101,7 @@
 					{#if loading}
 						<span class="loading loading-spinner loading-xs" />
 					{/if}
-					Activate
+					{$t('activate')}
 				</button>
 			</div>
 		{/if}

@@ -1,5 +1,6 @@
 <script>
 	import { editorSettings } from '$lib/stores';
+	import { t } from '$lib/i18n';
 </script>
 
 <div class="flex items-center gap-4 text-xs font-medium opacity-80">
@@ -9,7 +10,7 @@
 			type="checkbox"
 			class="toggle toggle-xs toggle-primary"
 		/>
-		<span>Seek on click</span>
+		<span>{$t('seek_on_click')}</span>
 	</label>
 
 	<label class="cursor-pointer flex items-center gap-2 hover:opacity-100 transition-opacity">
@@ -18,6 +19,6 @@
 			type="checkbox"
 			class="toggle toggle-xs toggle-success"
 		/>
-		<span>Autosave</span>
+		<span>{$t('autosave')}</span>
 	</label>
 </div>
