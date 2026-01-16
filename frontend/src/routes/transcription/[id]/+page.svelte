@@ -18,6 +18,12 @@
 		return new Date(parseInt(id.substring(0, 8), 16) * 1000).toLocaleString();
 	};
 
+	// export let data;
+	export let data;
+	$: if (data?.transcription) {
+		currentTranscription.set(data.transcription);
+	}
+
 	// Reactive text generation based on toggle
 	$: if ($currentTranscription) {
 		if (showTimestamps) {

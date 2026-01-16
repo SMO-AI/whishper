@@ -8,6 +8,12 @@
 	let video;
 	let tolerance = 0.1; // Tolerance level in seconds
 	let canPlay = false;
+
+	export let data;
+	$: if (data?.transcription) {
+		currentTranscription.set(data.transcription);
+	}
+
 	$: if (canPlay && video && Math.abs(video.currentTime - $currentVideoPlayerTime) > tolerance) {
 		console.log(video.currentTime, $currentVideoPlayerTime);
 		// When testing in Chrome, it works, just see https://stackoverflow.com/a/67584611
