@@ -1,4 +1,5 @@
 from backends.fasterwhisper import FasterWhisperBackend
+from backends.groq_backend import GroqBackend
 from backends.backend import Transcription
 from faster_whisper import decode_audio
 from models import DeviceType
@@ -12,7 +13,7 @@ def convert_audio(file) -> np.ndarray:
         return decode_audio(file, split_stereo=False, sampling_rate=16000)
 
 async def transcribe_from_filename(filename: str,
-                                    model_size: int,
+                                    model_size: str,
                                     language: Optional[str] = None,
                                     device: DeviceType = DeviceType.cpu) -> Transcription:
     
@@ -23,7 +24,7 @@ async def transcribe_from_filename(filename: str,
     return await transcribe_audio(audio, model_size, language, device)
 
 async def transcribe_file(file: io.BytesIO, 
-                          model_size: int, 
+                          model_size: str, 
                           language: Optional[str] = None, 
                           device: DeviceType = DeviceType.cpu) -> Transcription:
     contents = await file.read()  # async read
@@ -42,7 +43,7 @@ async def transcribe_file(file: io.BytesIO,
     return await transcribe_audio(audio, model_size, language, device)
 
 async def transcribe_audio(audio: np.ndarray, 
-                           model_size: int, 
+                           model_size: str,
                            language: Optional[str] = None, 
                            device: DeviceType = DeviceType.cpu) -> Transcription:
     
@@ -50,7 +51,12 @@ async def transcribe_audio(audio: np.ndarray,
         language = None
 
     # Load the model
-    model = FasterWhisperBackend(model_size=model_size, device=device)
+    if model_size.startswith("groq:"):
+        actual_model = model_size.split(":", 1)[1]
+        model = GroqBackend(model_size=actual_model, device=device)
+    else:
+        model = FasterWhisperBackend(model_size=model_size, device=device)
+    
     model.get_model()
     model.load()
     # Transcribe the file

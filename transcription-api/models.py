@@ -16,6 +16,9 @@ class ModelSize(str, Enum):
     medium = "medium"
     large_v2 = "large-v2"
     large_v3 = "large-v3"
+    groq_distil_whisper_large_v3_en = "groq:distil-whisper-large-v3-en"
+    groq_whisper_large_v3 = "groq:whisper-large-v3"
+    groq_whisper_large_v3_turbo = "groq:whisper-large-v3-turbo"
 
 class Languages(str, Enum):
     auto = "auto"

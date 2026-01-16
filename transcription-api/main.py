@@ -41,6 +41,8 @@ if __name__ == "__main__":
     model_list = os.environ.get("WHISPER_MODELS", "tiny,base,small")
     model_list = model_list.split(",")
     for model in model_list:
+        if model.startswith("groq:"):
+            continue
         m = FasterWhisperBackend(model_size=model)
         m.get_model()
     uvicorn.run(app, host="0.0.0.0", port=8000)

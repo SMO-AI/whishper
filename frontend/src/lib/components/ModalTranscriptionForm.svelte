@@ -51,7 +51,10 @@
 		'medium',
 		'medium.en',
 		'large-v2',
-		'large-v3'
+		'large-v3',
+		'groq:distil-whisper-large-v3-en',
+		'groq:whisper-large-v3',
+		'groq:whisper-large-v3-turbo'
 	];
 	// Sort the languages
 	languages.sort((a, b) => {
