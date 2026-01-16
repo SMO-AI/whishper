@@ -44,23 +44,23 @@ export const deleteTranscription = async function (id) {
 
 export const getRandomSentence = function () {
 	const sentences = [
-		"Audio in, text out. What's your sound about?",
-		"Drop the beat, I'll drop the text!",
-		'Everybody knows the bird is the word!',
-		'From soundcheck to spellcheck!',
-		"I got 99 problems but transcribing ain't one!",
-		"I'm all ears!",
-		'iTranscribe, you dictate!',
-		'Lost for words?',
-		'Sound check 1, 2, 3...',
-		"Sound's up! What's your script?",
-		'Transcribe, transcribe, transcribe!',
-		'What are you transcribing today?',
-		"What's the story, morning wordy?",
-		"Words, don't come easy, but I can help find the way.",
-		"You speak, I write. It's no magic, just AI!",
-		"Can't understand that language? I can translate!",
-		'I mean every word I say!'
+		'quote_1',
+		'quote_2',
+		'quote_3',
+		'quote_4',
+		'quote_5',
+		'quote_6',
+		'quote_7',
+		'quote_8',
+		'quote_9',
+		'quote_10',
+		'quote_11',
+		'quote_12',
+		'quote_13',
+		'quote_14',
+		'quote_15',
+		'quote_16',
+		'quote_17'
 	];
 
 	const randomSentence = sentences[Math.floor(Math.random() * sentences.length)];

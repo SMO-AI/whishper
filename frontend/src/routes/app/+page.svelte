@@ -293,10 +293,10 @@
 		<h1
 			class="text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary"
 		>
-			Scriptus
+			{$t('app_name')}
 		</h1>
 		<h2 class="font-mono text-center text-md opacity-60 max-w-md italic leading-relaxed px-4">
-			"{data.randomSentence}"
+			"{$t(data.randomSentence)}"
 		</h2>
 	</div>
 </header>

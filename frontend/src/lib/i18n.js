@@ -107,7 +107,25 @@ const translations = {
 		sub_demo_msg: 'Service is currently in demo testing mode. Please enter your secret code to activate full access.',
 		activation_code: 'Activation Code',
 		activate: 'Activate',
-		enter_code: 'Enter code...'
+		enter_code: 'Enter code...',
+		app_name: 'Scriptus',
+		quote_1: "Audio in, text out. What's your sound about?",
+		quote_2: "Drop the beat, I'll drop the text!",
+		quote_3: 'Everybody knows the bird is the word!',
+		quote_4: 'From soundcheck to spellcheck!',
+		quote_5: "I got 99 problems but transcribing ain't one!",
+		quote_6: "I'm all ears!",
+		quote_7: 'iTranscribe, you dictate!',
+		quote_8: 'Lost for words?',
+		quote_9: 'Sound check 1, 2, 3...',
+		quote_10: "Sound's up! What's your script?",
+		quote_11: 'Transcribe, transcribe, transcribe!',
+		quote_12: 'What are you transcribing today?',
+		quote_13: "What's the story, morning wordy?",
+		quote_14: "Words, don't come easy, but I can help find the way.",
+		quote_15: "You speak, I write. It's no magic, just AI!",
+		quote_16: "Can't understand that language? I can translate!",
+		quote_17: 'I mean every word I say!'
 	},
 	ru: {
 		settings: 'Настройки',
@@ -213,7 +231,25 @@ const translations = {
 		sub_demo_msg: 'Сервис находится в режиме демо-тестирования. Пожалуйста, введите секретный код для активации полного доступа.',
 		activation_code: 'Код активации',
 		activate: 'Активировать',
-		enter_code: 'Введите код...'
+		enter_code: 'Введите код...',
+		app_name: 'Скриптус',
+		quote_1: 'Звук превращается в текст. В чем смысл вашего аудио?',
+		quote_2: 'Ты даешь бит, я даю текст!',
+		quote_3: 'Слово — не воробей, вылетит — поймаем!',
+		quote_4: 'От саундчека до проверки орфографии!',
+		quote_5: 'У меня 99 проблем, но транскрибация — не одна из них!',
+		quote_6: 'Я весь во внимании!',
+		quote_7: 'Я пишу, вы диктуете!',
+		quote_8: 'Не находите слов?',
+		quote_9: 'Проверка связи: раз, два, три...',
+		quote_10: 'Звук пошел! Где ваш сценарий?',
+		quote_11: 'Транскрибируй, транскрибируй, транскрибируй!',
+		quote_12: 'Что расшифровываем сегодня?',
+		quote_13: 'Какая история с утра пораньше?',
+		quote_14: 'Слова даются нелегко, но я помогу найти путь.',
+		quote_15: 'Вы говорите, я пишу. Это не магия, это ИИ!',
+		quote_16: 'Не понимаете язык? Я переведу!',
+		quote_17: 'Я отвечаю за каждое слово!'
 	}
 };
 
