@@ -23,16 +23,23 @@ export async function load({ fetch }) {
 		? `${env.PUBLIC_API_HOST}/api/transcriptions`
 		: `${env.PUBLIC_INTERNAL_API_HOST}/api/transcriptions`;
 
-	const response = await fetch(endpoint, {
-		headers: {
-			Authorization: `Bearer ${accessToken}`
-		}
-	});
+	try {
+		const response = await fetch(endpoint, {
+			headers: {
+				Authorization: `Bearer ${accessToken}`
+			}
+		});
 
-	if (response.ok) {
-		const ts = await response.json();
-		transcriptions.update((_) => (ts && ts.length > 0 ? ts : []));
-	} else {
+		if (response.ok) {
+			const ts = await response.json();
+			transcriptions.update((_) => (ts && ts.length > 0 ? ts : []));
+		} else {
+			console.error('Failed to fetch transcriptions:', response.statusText);
+			transcriptions.update((_) => []);
+		}
+	} catch (err) {
+		console.error('Error fetching transcriptions:', err);
 		transcriptions.update((_) => []);
 	}
+
 }
