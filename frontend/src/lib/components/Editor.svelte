@@ -260,10 +260,10 @@
 				<table class="table table-pin-rows w-full border-separate border-spacing-y-3">
 					<thead>
 						<tr class="text-base-content/40 text-[10px] uppercase font-bold tracking-wider">
-							<th class="bg-transparent pl-4 border-b-0">#</th>
+							<th class="bg-transparent pl-4 border-b-0 hidden md:table-cell">#</th>
 							<th class="bg-transparent border-b-0">Timing (s)</th>
 							<th class="bg-transparent w-full border-b-0">Transcription</th>
-							<th class="bg-transparent border-b-0">Metrics</th>
+							<th class="bg-transparent border-b-0 hidden md:table-cell">Metrics</th>
 							<th class="bg-transparent pr-4 text-right border-b-0">Actions</th>
 						</tr>
 					</thead>

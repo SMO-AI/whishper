@@ -128,13 +128,18 @@
 </script>
 
 <tr
-	class="group text-sm transition-all duration-300 relative {isActive
+	class="group text-sm transition-all duration-300 relative cursor-pointer {isActive
 		? 'scale-[1.01]'
 		: 'hover:scale-[1.005]'}"
+	on:click={() => {
+		if ($editorSettings.seekOnClick) {
+			$currentVideoPlayerTime = segment.start;
+		}
+	}}
 >
 	<!-- ID Column -->
 	<td
-		class="bg-base-100 rounded-l-2xl border-l-[3px] shadow-sm align-top py-4 {isActive
+		class="bg-base-100 rounded-l-2xl border-l-[3px] shadow-sm align-top py-4 hidden md:table-cell {isActive
 			? 'border-primary shadow-md'
 			: 'border-base-content/5 group-hover:border-primary/50'}"
 	>
@@ -142,7 +147,11 @@
 	</td>
 
 	<!-- Timing Column -->
-	<td class="bg-base-100 shadow-sm align-top py-4 min-w-[140px] {isActive ? 'shadow-md' : ''}">
+	<td
+		class="bg-base-100 shadow-sm align-top py-4 min-w-[100px] md:min-w-[140px] rounded-l-2xl md:rounded-l-none border-l-[3px] md:border-l-0 {isActive
+			? 'shadow-md border-primary'
+			: 'border-base-content/5 md:border-transparent group-hover:border-primary/50 md:group-hover:border-transparent'}"
+	>
 		<div class="flex flex-col gap-2">
 			<!-- Start input -->
 			<div class="relative group/time">
@@ -153,12 +162,12 @@
 					bind:value={segment.start}
 					on:input={(e) => $currentVideoPlayerTime.set(e.target.value)}
 					on:input={handleHistory}
-					on:click={(e) => {
+					on:click|stopPropagation={(e) => {
 						if ($editorSettings.seekOnClick) $currentVideoPlayerTime = e.target.value;
 					}}
 				/>
 				<button
-					on:click={() => {
+					on:click|stopPropagation={() => {
 						segment.start = $currentVideoPlayerTime;
 						handleHistory();
 					}}
@@ -190,12 +199,12 @@
 					bind:value={segment.end}
 					on:input={(e) => ($currentVideoPlayerTime = e.target.value)}
 					on:input={handleHistory}
-					on:click={(e) => {
+					on:click|stopPropagation={(e) => {
 						if ($editorSettings.seekOnClick) $currentVideoPlayerTime = e.target.value;
 					}}
 				/>
 				<button
-					on:click={() => {
+					on:click|stopPropagation={() => {
 						segment.end = $currentVideoPlayerTime;
 						handleHistory();
 					}}
@@ -230,6 +239,7 @@
 		<div
 			bind:textContent={segment.text}
 			on:input={handleKeystrokes}
+			on:click|stopPropagation
 			class="w-full p-3 font-sans text-base leading-relaxed border border-transparent rounded-lg hover:border-base-content/10 focus:border-primary focus:bg-base-50 outline-none transition-all placeholder-opacity-50 min-h-[80px]"
 			class:border-error={getCps(segment) > 16}
 			class:bg-warning-content={isActive && false}
@@ -239,7 +249,12 @@
 	</td>
 
 	<!-- Metrics Column -->
-	<td class="bg-base-100 shadow-sm align-top py-4 min-w-[120px] {isActive ? 'shadow-md' : ''}">
+	<!-- Metrics Column -->
+	<td
+		class="bg-base-100 shadow-sm align-top py-4 min-w-[120px] hidden md:table-cell {isActive
+			? 'shadow-md'
+			: ''}"
+	>
 		<div class="flex flex-col gap-2">
 			<div class="flex items-center justify-between text-xs opacity-70">
 				<span>Duration</span>
@@ -279,7 +294,7 @@
 		>
 			<!-- Insert Above -->
 			<button
-				on:click={() => insertSegmentAbove(index, handleHistory)}
+				on:click|stopPropagation={() => insertSegmentAbove(index, handleHistory)}
 				class="btn btn-ghost btn-xs btn-square hover:bg-base-200 hover:text-primary transition-colors tooltip tooltip-left"
 				data-tip="Insert Above"
 			>
@@ -300,7 +315,7 @@
 
 			<!-- Split -->
 			<button
-				on:click={() => splitSegment(index, handleHistory)}
+				on:click|stopPropagation={() => splitSegment(index, handleHistory)}
 				class="btn btn-ghost btn-xs btn-square hover:bg-base-200 hover:text-info transition-colors tooltip tooltip-left"
 				data-tip="Split Segment"
 			>
@@ -321,7 +336,7 @@
 
 			<!-- Insert Below -->
 			<button
-				on:click={() => insertSegmentBelow(index, handleHistory)}
+				on:click|stopPropagation={() => insertSegmentBelow(index, handleHistory)}
 				class="btn btn-ghost btn-xs btn-square hover:bg-base-200 hover:text-secondary transition-colors tooltip tooltip-left"
 				data-tip="Insert Below"
 			>
@@ -344,7 +359,7 @@
 
 			<!-- Delete -->
 			<button
-				on:click={deleteSegment(index, handleHistory)}
+				on:click|stopPropagation={() => deleteSegment(index, handleHistory)}
 				class="btn btn-ghost btn-xs btn-square hover:bg-error hover:text-error-content transition-colors tooltip tooltip-left text-error opacity-60 hover:opacity-100"
 				data-tip="Delete Segment"
 			>

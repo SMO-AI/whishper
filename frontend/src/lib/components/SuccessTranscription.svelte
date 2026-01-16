@@ -39,122 +39,71 @@
 	></div>
 
 	<div class="flex flex-col md:flex-row gap-6">
-		<!-- Visual Column -->
-		<div
-			class="hidden md:flex flex-col items-center justify-center bg-base-300/50 rounded-xl p-4 min-w-[100px] border border-base-content/5 group-hover:border-primary/20 transition-colors"
+		<a
+			href="/transcription/{tr.id}"
+			class="flex-1 flex flex-col md:flex-row gap-6 text-inherit hover:text-inherit"
 		>
+			<!-- Visual Column -->
 			<div
-				class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2"
+				class="hidden md:flex flex-col items-center justify-center bg-base-300/50 rounded-xl p-4 min-w-[100px] border border-base-content/5 group-hover:border-primary/20 transition-colors"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="w-6 h-6"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
+				<div
+					class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2"
 				>
-					<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-					<path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-					<line x1="12" y1="19" x2="12" y2="23"></line>
-					<line x1="8" y1="23" x2="16" y2="23"></line>
-				</svg>
-			</div>
-			<span class="text-[10px] font-bold uppercase tracking-wider opacity-60">{duration}</span>
-		</div>
-
-		<!-- Content Column -->
-		<div class="flex-1 flex flex-col justify-between space-y-3">
-			<div>
-				<div class="flex flex-wrap items-center gap-2 mb-2">
-					<h3
-						class="text-lg font-bold text-base-content group-hover:text-primary transition-colors truncate max-w-md"
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="w-6 h-6"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
 					>
-						{fileName}
-					</h3>
-					<div class="flex flex-wrap gap-2">
-						<div
-							class="badge badge-outline badge-sm opacity-70 group-hover:opacity-100 transition-opacity uppercase font-mono text-[10px]"
+						<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+						<path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+						<line x1="12" y1="19" x2="12" y2="23"></line>
+						<line x1="8" y1="23" x2="16" y2="23"></line>
+					</svg>
+				</div>
+				<span class="text-[10px] font-bold uppercase tracking-wider opacity-60">{duration}</span>
+			</div>
+
+			<!-- Content Column -->
+			<div class="flex-1 flex flex-col justify-between space-y-3">
+				<div>
+					<div class="flex flex-wrap items-center gap-2 mb-2">
+						<h3
+							class="text-lg font-bold text-base-content group-hover:text-primary transition-colors truncate max-w-md"
 						>
-							{tr.modelSize}
+							{fileName}
+						</h3>
+						<div class="flex flex-wrap gap-2">
+							<div
+								class="badge badge-outline badge-sm opacity-70 group-hover:opacity-100 transition-opacity uppercase font-mono text-[10px]"
+							>
+								{tr.modelSize}
+							</div>
+							<div
+								class="badge badge-primary badge-sm font-bold uppercase text-[10px] tracking-tight"
+							>
+								{tr.task || 'transcribe'}
+							</div>
+							<div class="badge badge-ghost badge-sm font-mono text-[10px]">
+								{tr.result.language}
+							</div>
 						</div>
-						<div
-							class="badge badge-primary badge-sm font-bold uppercase text-[10px] tracking-tight"
-						>
-							{tr.task || 'transcribe'}
-						</div>
-						<div class="badge badge-ghost badge-sm font-mono text-[10px]">{tr.result.language}</div>
 					</div>
+
+					<p
+						class="text-sm text-base-content/70 italic line-clamp-2 md:line-clamp-3 mb-3 leading-relaxed"
+					>
+						"{snippet}"
+					</p>
 				</div>
 
-				<p
-					class="text-sm text-base-content/70 italic line-clamp-2 md:line-clamp-3 mb-3 leading-relaxed"
-				>
-					"{snippet}"
-				</p>
-			</div>
-
-			<div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-medium opacity-60">
-				<div class="flex items-center gap-1.5 md:hidden">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="w-3.5 h-3.5"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"
-						></polyline></svg
-					>
-					{duration}
-				</div>
-				<div class="flex items-center gap-1.5">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="w-3.5 h-3.5"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line
-							x1="16"
-							y1="2"
-							x2="16"
-							y2="6"
-						></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"
-						></line></svg
-					>
-					{date}
-				</div>
-				<div class="flex items-center gap-1.5">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="w-3.5 h-3.5"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline
-							points="14 2 14 8 20 8"
-						></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line
-							x1="16"
-							y1="17"
-							x2="8"
-							y2="17"
-						></line><polyline points="10 9 9 9 8 9"></polyline></svg
-					>
-					{wordCount} words
-				</div>
-				{#if tr.result.processing_duration}
-					<div class="flex items-center gap-1.5">
+				<div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-medium opacity-60">
+					<div class="flex items-center gap-1.5 md:hidden">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							class="w-3.5 h-3.5"
@@ -167,11 +116,69 @@
 							><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"
 							></polyline></svg
 						>
-						took {tr.result.processing_duration.toFixed(1)}s
+						{duration}
 					</div>
-				{/if}
+					<div class="flex items-center gap-1.5">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="w-3.5 h-3.5"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line
+								x1="16"
+								y1="2"
+								x2="16"
+								y2="6"
+							></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"
+							></line></svg
+						>
+						{date}
+					</div>
+					<div class="flex items-center gap-1.5">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="w-3.5 h-3.5"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline
+								points="14 2 14 8 20 8"
+							></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line
+								x1="16"
+								y1="17"
+								x2="8"
+								y2="17"
+							></line><polyline points="10 9 9 9 8 9"></polyline></svg
+						>
+						{wordCount} words
+					</div>
+					{#if tr.result.processing_duration}
+						<div class="flex items-center gap-1.5">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="w-3.5 h-3.5"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"
+								></polyline></svg
+							>
+							took {tr.result.processing_duration.toFixed(1)}s
+						</div>
+					{/if}
+				</div>
 			</div>
-		</div>
+		</a>
 
 		<!-- Action Column -->
 		<div
