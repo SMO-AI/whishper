@@ -39,15 +39,14 @@ FROM python:3.11-slim as base
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get -qq update \
     && apt-get -qq install --no-install-recommends \
-    ffmpeg curl nodejs nginx supervisor \
+    ffmpeg curl nodejs nginx supervisor build-essential python3-dev libsndfile1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Python service setup
 COPY ./transcription-api /app/transcription
 WORKDIR /app/transcription
 RUN pip3 install --upgrade pip --break-system-packages && \
-    pip3 install --no-cache-dir -r requirements.txt --break-system-packages && \
-    pip3 install --no-cache-dir python-multipart --break-system-packages
+    pip3 install --no-cache-dir -r requirements.txt --break-system-packages
 
 # Node.js service setup
 ENV BODY_SIZE_LIMIT=0
