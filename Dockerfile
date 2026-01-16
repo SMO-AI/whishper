@@ -1,11 +1,3 @@
-# YT-DLP Download and setup
-FROM --platform=$BUILDPLATFORM golang:bookworm AS ytdlp_cache
-ARG TARGETOS
-ARG TARGETARCH
-RUN apt update && apt install -y wget
-RUN wget https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -O /usr/local/bin/yt-dlp
-RUN chmod a+rx /usr/local/bin/yt-dlp
-
 # Backend setup
 FROM devopsworks/golang-upx:latest as backend-builder
 
@@ -42,6 +34,9 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     ffmpeg curl nodejs nginx supervisor build-essential python3-dev python3-pip libsndfile1 \
     && rm -rf /var/lib/apt/lists/*
 
+# Install yt-dlp via pip (more reliable than wget from github)
+RUN python3 -m pip install --no-cache-dir --break-system-packages yt-dlp
+
 # Python service setup
 COPY ./transcription-api /app/transcription
 WORKDIR /app/transcription
@@ -57,14 +52,12 @@ COPY --from=frontend-prod-deps /app/node_modules /app/frontend/node_modules
 # Golang service setup
 COPY --from=backend-builder /app/whishper /bin/whishper 
 RUN chmod a+rx /bin/whishper
-COPY --from=ytdlp_cache /usr/local/bin/yt-dlp /bin/yt-dlp
 
 WORKDIR /app
 RUN mkdir -p uploads models
 
 # Nginx setup
 COPY ./nginx.conf /etc/nginx/nginx.conf
-
 
 # Cleanup to make the image smaller
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* ~/.cache /var/cache
