@@ -31,7 +31,8 @@ services:
     build: .
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "8082:80"
+
     volumes:
       - uploads:/app/uploads
       - models:/app/models
