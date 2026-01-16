@@ -25,4 +25,8 @@ export let editorSettings = writable({
 });
 
 // Video player settings
+// Video player settings
 export const currentVideoPlayerTime = writable(0);
+
+// App Theme
+export const theme = writable("light");

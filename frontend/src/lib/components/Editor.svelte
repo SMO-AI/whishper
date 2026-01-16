@@ -7,7 +7,6 @@
 	import EditorSegment from './EditorSegment.svelte';
 	import { CLIENT_API_HOST } from '$lib/utils';
 
-
 	let language = writable('original');
 
 	// Segments lazy loading
@@ -37,13 +36,14 @@
 
 	async function saveChanges() {
 		var url = `${CLIENT_API_HOST}/api/transcriptions`; // replace with your actual endpoint
-		console.log($language)
+		console.log($language);
 		// Update text to match segments
 		if ($language == 'original') {
 			$currentTranscription.result.text = await textFromSegments();
 		} else {
 			$currentTranscription.translations.forEach(async (translation) => {
-				if (translation.targetLanguage == $language) translation.result.text = await textFromSegments();
+				if (translation.targetLanguage == $language)
+					translation.result.text = await textFromSegments();
 			});
 		}
 
@@ -161,122 +161,149 @@
 {#if $currentTranscription.status != 2}
 	<div class="flex items-center justify-center">
 		<span class="loading loading-spinner loading-lg"></span>
-		<p class="text-center">Waiting for task to finish {$currentTranscription.status == 3 ? "translating" : "transcribing"}...</p>
+		<p class="text-center">
+			Waiting for task to finish {$currentTranscription.status == 3
+				? 'translating'
+				: 'transcribing'}...
+		</p>
 	</div>
 {:else}
-<div class="flex flex-col items-center break-words">
-	<h1 class="text-center text-2xl mt-8 break-words">
-		{$currentTranscription.fileName.split('_WHSHPR_')[1]}
-	</h1>
-	<!-- Menu -->
-	<ul class="menu menu-horizontal bg-base-200 rounded-box mt-6">
-		<li>
-			<a href="/" class="tooltip" data-tip="Home">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-5 w-5"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-					/></svg
-				>
-			</a>
-		</li>
-		<li>
-			<button on:click={saveChanges} class="tooltip" data-tip="Save (Ctrl+S)">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="icon icon-tabler icon-tabler-device-floppy"
-					width="24"
-					height="24"
-					viewBox="0 0 24 24"
-					stroke-width="2"
-					stroke="currentColor"
-					fill="none"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-					<path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" />
-					<path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-					<path d="M14 4l0 4l-6 0l0 -4" />
-				</svg>
-			</button>
-		</li>
-	</ul>
-	<!-- End Menu -->
+	<div class="flex flex-col h-full relative bg-base-100">
+		<!-- Sticky Header -->
+		<div
+			class="sticky top-0 z-30 bg-base-100/95 backdrop-blur-md border-b border-base-content/10 px-4 py-3 md:px-6 md:py-4 shadow-sm transition-all"
+		>
+			<div class="flex flex-col gap-4">
+				<!-- Top Row: Title & Main Actions -->
+				<div class="flex items-center justify-between gap-4">
+					<div class="flex-1 min-w-0 flex items-center gap-3">
+						<a
+							href="/"
+							class="btn btn-ghost btn-sm btn-circle opacity-60 hover:opacity-100 transition-opacity"
+							title="Back to Home"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="w-5 h-5"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M10 19l-7-7m0 0l7-7m-7 7h18"
+								/></svg
+							>
+						</a>
 
-	{#if $currentTranscription.translations.length > 0}
-		<div class="form-control max-w-xs my-4">
-			<label for="language" class="label">
-				<span class="label-text">Subtitles language</span>
-			</label>
-			<select
-				bind:value={$language}
-				name="language"
-				class="select select-sm select-bordered uppercase"
-			>
-				<option value="original">✅ {$currentTranscription.result.language}</option>
-				{#each $currentTranscription.translations as translation}
-					<option value={translation.targetLanguage}>🤖 {translation.targetLanguage}</option>
-				{/each}
-			</select>
+						<div class="flex flex-col overflow-hidden">
+							<h1
+								class="text-lg md:text-xl font-bold truncate leading-tight tracking-tight"
+								title={$currentTranscription.fileName}
+							>
+								{$currentTranscription.fileName.split('_WHSHPR_')[1]}
+							</h1>
+							<span class="text-[10px] uppercase font-bold tracking-widest opacity-40"
+								>Editor Mode</span
+							>
+						</div>
+					</div>
+
+					<div class="flex items-center gap-2">
+						<button
+							on:click={saveChanges}
+							class="btn btn-primary btn-sm gap-2 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all font-bold"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="w-4 h-4"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+								></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline
+									points="7 3 7 8 15 8"
+								></polyline></svg
+							>
+							<span class="hidden md:inline">Save Changes</span>
+						</button>
+					</div>
+				</div>
+
+				<!-- Bottom Row: Settings & Filters -->
+				<div class="flex flex-wrap items-center justify-between gap-4 pt-1 pl-12 pr-1">
+					<EditorSettings />
+
+					{#if $currentTranscription.translations.length > 0}
+						<select
+							bind:value={$language}
+							name="language"
+							class="select select-xs select-bordered max-w-xs font-mono uppercase bg-base-200/50 focus:bg-base-100 transition-all"
+						>
+							<option value="original">✅ {$currentTranscription.result.language}</option>
+							{#each $currentTranscription.translations as translation}
+								<option value={translation.targetLanguage}>🤖 {translation.targetLanguage}</option>
+							{/each}
+						</select>
+					{/if}
+				</div>
+			</div>
 		</div>
-	{/if}
-</div>
-<div class="mt-4">
-	<!-- Editor configuration -->
-	<EditorSettings />
-	<!-- End Editor configuration -->
 
-	<div class="overflow-x-auto">
-		<!-- Segments table -->
-		<table class="table px-4">
-			<thead>
-				<tr>
-					<th />
-					<th>Start</th>
-					<th>End</th>
-					<th>Text</th>
-					<th>Info</th>
-					<th />
-				</tr>
-			</thead>
-			<tbody>
-				{#if $language == 'original'}
-					{#each $currentTranscription.result.segments.slice(0, segmentsToShow) as segment, index (segment.id)}
-						<EditorSegment {segment} {index} translationIndex={-1} />
-					{/each}
-				{:else}
-					{#each $currentTranscription.translations as translation, translationIndex}
-						{#if translation.targetLanguage == $language}
-							{#each translation.result.segments.slice(0, segmentsToShow) as segment, index (segment.id)}
-								<EditorSegment {segment} {index} {translationIndex} />
+		<!-- Scrollable Content -->
+		<div class="flex-1 overflow-y-auto custom-scrollbar bg-base-200/30 p-2 md:p-6">
+			<div class="max-w-6xl mx-auto">
+				<table class="table table-pin-rows w-full border-separate border-spacing-y-3">
+					<thead>
+						<tr class="text-base-content/40 text-[10px] uppercase font-bold tracking-wider">
+							<th class="bg-transparent pl-4 border-b-0">#</th>
+							<th class="bg-transparent border-b-0">Timing (s)</th>
+							<th class="bg-transparent w-full border-b-0">Transcription</th>
+							<th class="bg-transparent border-b-0">Metrics</th>
+							<th class="bg-transparent pr-4 text-right border-b-0">Actions</th>
+						</tr>
+					</thead>
+					<tbody class="text-sm">
+						{#if $language == 'original'}
+							{#each $currentTranscription.result.segments.slice(0, segmentsToShow) as segment, index (segment.id)}
+								<EditorSegment {segment} {index} translationIndex={-1} />
+							{/each}
+						{:else}
+							{#each $currentTranscription.translations as translation, translationIndex}
+								{#if translation.targetLanguage == $language}
+									{#each translation.result.segments.slice(0, segmentsToShow) as segment, index (segment.id)}
+										<EditorSegment {segment} {index} {translationIndex} />
+									{/each}
+								{/if}
 							{/each}
 						{/if}
-					{/each}
-				{/if}
-			</tbody>
-		</table>
-		<button bind:this={loadMoreButton}>
-			{#if $language == 'original'}
-				{#if segmentsToShow >= $currentTranscription.result.segments.length}
-					No more segments to load
-				{:else}
-					Loading more...
-				{/if}
-			{:else if segmentsToShow >= $currentTranscription.translations.filter((translation) => translation.targetLanguage == $language)[0].result.segments.length}
-				No more segments to load
-			{:else}
-				Loading more...
-			{/if}
-		</button>
-		<!-- End Segments table -->
+					</tbody>
+				</table>
+
+				<!-- Load More / Trigger -->
+				<div class="py-12 flex justify-center w-full">
+					<button
+						bind:this={loadMoreButton}
+						class="btn btn-ghost btn-sm opacity-30 hover:opacity-100 transition-opacity"
+					>
+						{#if $language == 'original'}
+							{#if segmentsToShow >= $currentTranscription.result.segments.length}
+								<span class="text-xs italic">End of transcription</span>
+							{:else}
+								<span class="loading loading-dots loading-xs"></span>
+							{/if}
+						{:else if segmentsToShow >= $currentTranscription.translations.filter((translation) => translation.targetLanguage == $language)[0].result.segments.length}
+							<span class="text-xs italic">End of transcription</span>
+						{:else}
+							<span class="loading loading-dots loading-xs"></span>
+						{/if}
+					</button>
+				</div>
+			</div>
+		</div>
 	</div>
-</div>
 {/if}
