@@ -4,6 +4,9 @@ services:
   mongo:
     image: mongo
     restart: unless-stopped
+    labels:
+      - "coolify.managed=true"
+      - "traefik.enable=false"
     volumes:
       - mongo_data:/data/db
       - mongo_logs:/var/log/mongodb/
@@ -17,6 +20,9 @@ services:
   translate:
     image: libretranslate/libretranslate:latest
     restart: unless-stopped
+    labels:
+      - "coolify.managed=true"
+      - "traefik.enable=false"
     expose:
       - 5000
     volumes:
