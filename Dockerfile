@@ -28,16 +28,13 @@ RUN pnpm run build
 # Base container
 FROM python:3.11-slim as base
 
-RUN export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -qq update \
-    && apt-get -qq install --no-install-recommends -y \
-    ffmpeg curl nodejs nginx supervisor build-essential python3-dev python3-pip libsndfile1 \
-    && ln -sf /usr/bin/nodejs /usr/bin/node \
+RUN apt-get update && apt-get install -y curl \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends \
+    ffmpeg nodejs nginx supervisor build-essential python3-dev python3-pip libsndfile1 \
     && rm -rf /var/lib/apt/lists/*
 
-
-
-# Install yt-dlp via pip (more reliable than wget from github)
+# Install yt-dlp
 RUN python3 -m pip install --no-cache-dir --break-system-packages yt-dlp
 
 # Python service setup
@@ -54,8 +51,6 @@ COPY --from=frontend-build /app/build /app/frontend-build
 COPY --from=frontend-build /app/package.json /app/frontend-build/package.json
 COPY --from=frontend-build /app/node_modules /app/frontend-build/node_modules
 
-
-
 # Golang service setup
 COPY --from=backend-builder /app/whishper /bin/whishper 
 RUN chmod a+rx /bin/whishper
@@ -66,11 +61,10 @@ RUN mkdir -p uploads models
 # Nginx setup
 COPY ./nginx.conf /etc/nginx/nginx.conf
 
-# Cleanup to make the image smaller
+# Cleanup
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* ~/.cache /var/cache
 
 COPY ./supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 ENTRYPOINT ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
-# Expose ports for each service and Nginx
 EXPOSE 8080 3000 5000 80
