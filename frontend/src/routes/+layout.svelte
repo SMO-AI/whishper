@@ -1,9 +1,14 @@
 <script>
 	import { onMount } from 'svelte';
-	import { theme, locale } from '$lib/stores';
+	import { theme, locale, transcriptions } from '$lib/stores';
 	import { supabase } from '$lib/supabase';
 	import { goto } from '$app/navigation';
 	import '../app.css';
+
+	export let data;
+	$: if (data?.transcriptions) {
+		transcriptions.set(data.transcriptions);
+	}
 
 	onMount(async () => {
 		if (!supabase) return;
