@@ -45,9 +45,11 @@ RUN python3 -m pip install --no-cache-dir --break-system-packages -r requirement
 
 # Node.js service setup
 ENV BODY_SIZE_LIMIT=0
-COPY ./frontend /app/frontend
-COPY --from=frontend-build /app/build /app/frontend
-COPY --from=frontend-prod-deps /app/node_modules /app/frontend/node_modules
+ENV NODE_ENV=production
+COPY --from=frontend-build /app/build /app/frontend-build
+COPY --from=frontend-build /app/package.json /app/frontend-build/package.json
+COPY --from=frontend-build /app/node_modules /app/frontend-build/node_modules
+
 
 # Golang service setup
 COPY --from=backend-builder /app/whishper /bin/whishper 
