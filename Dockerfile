@@ -45,8 +45,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 # Python service setup
 COPY ./transcription-api /app/transcription
 WORKDIR /app/transcription
-RUN pip3 install -r requirements.txt
-RUN pip3 install python-multipart
+RUN pip3 install -r requirements.txt --break-system-packages
+RUN pip3 install python-multipart --break-system-packages
 
 # Node.js service setup
 ENV BODY_SIZE_LIMIT=0
