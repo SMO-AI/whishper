@@ -1,3 +1,4 @@
+<script>
 	import { onMount } from 'svelte';
 	import { theme } from '$lib/stores';
 	import { supabase } from '$lib/supabase';
