@@ -1,6 +1,5 @@
 fastapi
-faster-whisper==0.10.0
-pydantic
+faster-whisper>=0.10.0
 python-dotenv
 uvicorn
 python-multipart
