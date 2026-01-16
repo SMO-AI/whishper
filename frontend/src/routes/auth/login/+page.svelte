@@ -61,51 +61,31 @@
 	}
 </script>
 
-<div class="card bg-base-100 shadow-2xl border border-base-200">
-	<div class="card-body">
-		<div class="text-center mb-6">
-			<h2
-				class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary"
-			>
-				Welcome Back
-			</h2>
-			<p class="opacity-60">Sign in to continue transcribing</p>
-		</div>
-
-		<div class="form-control w-full">
-			<label class="label" for="email">
-				<span class="label-text">Email</span>
-			</label>
-			<input
-				id="email"
-				type="email"
-				placeholder="email@example.com"
-				bind:value={email}
-				class="input input-bordered w-full"
-			/>
-		</div>
-
-		<div class="form-control w-full mt-4">
-			<label class="label" for="password">
-				<span class="label-text">Password</span>
-			</label>
-			<input
-				id="password"
-				type="password"
-				placeholder="••••••••"
-				bind:value={password}
-				class="input input-bordered w-full"
-			/>
-			<label class="label" for="forgot">
-				<a id="forgot" href="/auth/forgot-password" class="label-text-alt link link-primary"
-					>Forgot password?</a
+<div class="card bg-base-100/80 backdrop-blur-xl shadow-2xl border border-white/10 overflow-hidden">
+	<div class="card-body p-8">
+		<div class="text-center mb-8">
+			<div class="inline-block p-3 rounded-2xl bg-primary/10 mb-4">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="w-10 h-10 text-primary"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
 				>
-			</label>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+					/>
+				</svg>
+			</div>
+			<h2 class="text-3xl font-bold tracking-tight mb-2">Welcome Back</h2>
+			<p class="opacity-60 text-sm">Enter your credentials to access your workspace</p>
 		</div>
 
-		<div class="divider text-xs opacity-50 my-4">OR CONTINUE WITH</div>
 		<button
-			class="btn btn-outline w-full gap-2 hover:bg-base-200 transition-all duration-300"
+			class="btn btn-outline w-full gap-3 h-12 hover:bg-base-content/5 hover:border-base-content/20 transition-all font-medium normal-case text-base mb-6 relative overflow-hidden group"
 			on:click={handleGoogleLogin}
 			disabled={loading}
 		>
@@ -127,37 +107,110 @@
 					fill="#EA4335"
 				/>
 			</svg>
-			Google
-		</button>
-		<button class="btn btn-primary w-full" on:click={handleLogin} disabled={loading}>
-			{#if loading}<span class="loading loading-spinner loading-sm" />{/if}
-			Sign In
-		</button>
-		<div class="divider text-xs opacity-50 my-1">OR</div>
-		<button
-			class="btn btn-ghost border border-base-content/10 w-full hover:bg-base-200"
-			on:click={handleMagicLink}
-			disabled={loading}
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="w-5 h-5 mr-2"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					stroke-width="2"
-					d="M13 10V3L4 14h7v7l9-11h-7z"
-				/>
-			</svg>
-			Sign in with Magic Link
+			Continue with Google
 		</button>
 
-		<div class="text-center mt-6 text-sm opacity-80">
-			Don't have an account? <a href="/auth/register" class="link link-primary font-bold">Sign up</a
+		<div class="relative mb-6">
+			<div class="absolute inset-0 flex items-center">
+				<div class="w-full border-t border-base-content/10" />
+			</div>
+			<div class="relative flex justify-center text-xs uppercase">
+				<span class="bg-base-100 px-2 text-base-content/40 font-semibold tracking-wider"
+					>Or email</span
+				>
+			</div>
+		</div>
+
+		<div class="space-y-4">
+			<div class="form-control w-full">
+				<label class="label" for="email">
+					<span class="label-text font-medium">Email</span>
+				</label>
+				<div class="relative">
+					<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5 opacity-40"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
+							/>
+						</svg>
+					</div>
+					<input
+						id="email"
+						type="email"
+						placeholder="name@example.com"
+						bind:value={email}
+						class="input input-bordered w-full pl-10 bg-base-200/50 focus:bg-base-100 transition-colors"
+					/>
+				</div>
+			</div>
+
+			<div class="form-control w-full">
+				<label class="label justify-between items-center" for="password">
+					<span class="label-text font-medium">Password</span>
+					<a
+						href="/auth/forgot-password"
+						class="label-text-alt link link-primary hover:no-underline opacity-80 hover:opacity-100"
+						>Forgot password?</a
+					>
+				</label>
+				<div class="relative">
+					<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5 opacity-40"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+							/>
+						</svg>
+					</div>
+					<input
+						id="password"
+						type="password"
+						placeholder="••••••••"
+						bind:value={password}
+						class="input input-bordered w-full pl-10 bg-base-200/50 focus:bg-base-100 transition-colors"
+					/>
+				</div>
+			</div>
+
+			<button
+				class="btn btn-primary w-full shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all text-lg font-bold mt-2"
+				on:click={handleLogin}
+				disabled={loading}
+			>
+				{#if loading}<span class="loading loading-spinner loading-sm" />{/if}
+				Sign In
+			</button>
+
+			<button
+				class="btn btn-ghost btn-sm w-full font-normal opacity-70 hover:opacity-100 hover:bg-transparent"
+				on:click={handleMagicLink}
+				disabled={loading}
+			>
+				Sign in with <span class="text-primary font-medium ml-1">Magic Link</span>
+			</button>
+		</div>
+
+		<div class="text-center mt-8 text-sm opacity-60">
+			Don't have an account? <a
+				href="/auth/register"
+				class="link link-primary font-bold hover:no-underline">Create account</a
 			>
 		</div>
 	</div>

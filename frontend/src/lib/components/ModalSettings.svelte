@@ -152,13 +152,18 @@
 			<button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 z-50">✕</button>
 		</form>
 
-		<div class="flex h-[500px]">
+		<div class="flex flex-col md:flex-row h-[70vh] md:h-[500px]">
 			<!-- Sidebar -->
-			<div class="w-1/3 bg-base-200 p-6 flex flex-col gap-2">
-				<h3 class="text-xl font-bold mb-6 px-2">{$t('settings')}</h3>
+			<div
+				class="w-full md:w-1/3 bg-base-200 p-4 md:p-6 flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible flex-shrink-0"
+			>
+				<h3 class="text-xl font-bold mb-2 md:mb-6 px-2 hidden md:block">{$t('settings')}</h3>
 
 				<button
-					class="btn btn-ghost justify-start gap-3 {activeTab === 'profile' ? 'bg-base-300' : ''}"
+					class="btn btn-ghost btn-sm md:btn-md flex-1 md:flex-none justify-center md:justify-start gap-2 md:gap-3 {activeTab ===
+					'profile'
+						? 'bg-base-300'
+						: ''}"
 					on:click={() => (activeTab = 'profile')}
 				>
 					<svg
@@ -174,11 +179,15 @@
 							d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
 						/></svg
 					>
-					{$t('profile')}
+					<span class="hidden md:inline">{$t('profile')}</span>
+					<span class="md:hidden">Profile</span>
 				</button>
 
 				<button
-					class="btn btn-ghost justify-start gap-3 {activeTab === 'settings' ? 'bg-base-300' : ''}"
+					class="btn btn-ghost btn-sm md:btn-md flex-1 md:flex-none justify-center md:justify-start gap-2 md:gap-3 {activeTab ===
+					'settings'
+						? 'bg-base-300'
+						: ''}"
 					on:click={() => (activeTab = 'settings')}
 				>
 					<svg
@@ -199,13 +208,17 @@
 							d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
 						/></svg
 					>
-					{$t('general')}
+					<span class="hidden md:inline">{$t('general')}</span>
+					<span class="md:hidden">General</span>
 				</button>
 
-				<div class="mt-auto">
+				<div class="mt-auto hidden md:block">
 					<button
 						class="btn btn-ghost text-error justify-start gap-3 w-full"
-						on:click={() => supabase.auth.signOut()}
+						on:click={async () => {
+							await supabase.auth.signOut();
+							window.location.href = '/';
+						}}
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -257,28 +270,29 @@
 							</div>
 						</div>
 
-						<!-- Form -->
-						<div class="form-control w-full">
-							<label class="label">
-								<span class="label-text">{$t('email')}</span>
-							</label>
-							<input
-								type="text"
-								value={profile.email}
-								readonly
-								class="input input-bordered w-full opacity-60 cursor-not-allowed"
-							/>
-						</div>
+						<div class="flex flex-col md:flex-row gap-4">
+							<div class="form-control w-full">
+								<label class="label">
+									<span class="label-text">{$t('full_name')}</span>
+								</label>
+								<input
+									type="text"
+									bind:value={profile.full_name}
+									class="input input-bordered w-full"
+								/>
+							</div>
 
-						<div class="form-control w-full">
-							<label class="label">
-								<span class="label-text">{$t('full_name')}</span>
-							</label>
-							<input
-								type="text"
-								bind:value={profile.full_name}
-								class="input input-bordered w-full"
-							/>
+							<div class="form-control w-full">
+								<label class="label">
+									<span class="label-text">{$t('email')}</span>
+								</label>
+								<input
+									type="text"
+									value={profile.email}
+									readonly
+									class="input input-bordered w-full opacity-60 cursor-not-allowed"
+								/>
+							</div>
 						</div>
 
 						<div class="form-control w-full">
@@ -302,6 +316,31 @@
 								placeholder="••••••••"
 								class="input input-bordered w-full"
 							/>
+						</div>
+
+						<div class="md:hidden pt-4 border-t border-base-200 mt-4">
+							<button
+								class="btn btn-ghost text-error w-full gap-2"
+								on:click={async () => {
+									await supabase.auth.signOut();
+									window.location.href = '/';
+								}}
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="w-5 h-5"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+									><path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+									/></svg
+								>
+								{$t('logout')}
+							</button>
 						</div>
 
 						<div class="flex justify-end pt-4">

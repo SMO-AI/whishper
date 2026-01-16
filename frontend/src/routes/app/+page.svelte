@@ -124,6 +124,9 @@
 	let lastAnimationIndex = -1;
 
 	function triggerCloudAnimation() {
+		// Log for verification
+		console.log('☁️ Cloud animation triggered!');
+
 		// If already animating, don't trigger another one
 		if (cloudAnimation) return;
 
@@ -275,11 +278,11 @@
 	<div class="flex flex-col items-center justify-center space-y-4">
 		<button
 			on:click={triggerCloudAnimation}
-			class="relative group focus:outline-none transition-transform active:scale-95"
+			class="relative group focus:outline-none transition-transform active:scale-95 z-20"
 			aria-label="Click for a surprise"
 		>
 			<div
-				class="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-full blur opacity-25 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"
+				class="absolute -inset-2 bg-gradient-to-r from-primary to-secondary rounded-full blur opacity-25 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"
 			/>
 			<img
 				class="relative w-24 h-24 cursor-pointer select-none transition-all duration-300 hover:scale-110 {cloudAnimation}"
@@ -389,8 +392,8 @@
 </main>
 
 <style>
-	/* Cloud Animations */
-	.animate-cloud-bounce {
+	/* Cloud Animations (Global to support dynamic class names) */
+	:global(.animate-cloud-bounce) {
 		animation: cloud-bounce 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 	}
 
@@ -412,25 +415,25 @@
 		}
 	}
 
-	.animate-cloud-shake {
+	:global(.animate-cloud-shake) {
 		animation: cloud-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 	}
-	.animate-cloud-spin {
+	:global(.animate-cloud-spin) {
 		animation: cloud-spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
 	}
-	.animate-cloud-pulse {
+	:global(.animate-cloud-pulse) {
 		animation: cloud-pulse 0.5s ease-in-out both;
 	}
-	.animate-cloud-wobble {
+	:global(.animate-cloud-wobble) {
 		animation: cloud-wobble 0.8s ease-in-out both;
 	}
-	.animate-cloud-rubber {
+	:global(.animate-cloud-rubber) {
 		animation: cloud-rubber 0.8s ease-in-out both;
 	}
-	.animate-cloud-tada {
+	:global(.animate-cloud-tada) {
 		animation: cloud-tada 0.8s ease-in-out both;
 	}
-	.animate-cloud-jello {
+	:global(.animate-cloud-jello) {
 		animation: cloud-jello 0.8s ease-in-out both;
 	}
 
