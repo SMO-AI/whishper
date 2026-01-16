@@ -12,7 +12,7 @@
 
 		if (!session) {
 			const path = window.location.pathname;
-			if (!path.startsWith('/auth')) {
+			if (path !== '/' && !path.startsWith('/auth')) {
 				goto('/auth/login');
 			}
 		} else if (window.location.pathname === '/' || window.location.pathname.startsWith('/auth')) {
