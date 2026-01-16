@@ -42,19 +42,19 @@
 		'zh'
 	];
 	let models = [
-		'tiny',
-		'tiny.en',
-		'base',
-		'base.en',
-		'small',
-		'small.en',
-		'medium',
-		'medium.en',
-		'large-v2',
-		'large-v3',
-		'groq:distil-whisper-large-v3-en',
-		'groq:whisper-large-v3',
-		'groq:whisper-large-v3-turbo'
+		{ value: 'tiny', label: 'Whisper Tiny' },
+		{ value: 'tiny.en', label: 'Whisper Tiny (EN)' },
+		{ value: 'base', label: 'Whisper Base' },
+		{ value: 'base.en', label: 'Whisper Base (EN)' },
+		{ value: 'small', label: 'Whisper Small' },
+		{ value: 'small.en', label: 'Whisper Small (EN)' },
+		{ value: 'medium', label: 'Whisper Medium' },
+		{ value: 'medium.en', label: 'Whisper Medium (EN)' },
+		{ value: 'large-v2', label: 'Whisper Large V2' },
+		{ value: 'large-v3', label: 'Whisper Large V3' },
+		{ value: 'groq:distil-whisper-large-v3-en', label: 'Groq Distil Whisper Large V3 (EN)' },
+		{ value: 'groq:whisper-large-v3', label: 'Groq Whisper Large V3' },
+		{ value: 'groq:whisper-large-v3-turbo', label: 'Groq Whisper Large V3 Turbo' }
 	];
 	// Sort the languages
 	languages.sort((a, b) => {
@@ -194,9 +194,9 @@
 				<label for="modelSize" class="label">
 					<span class="label-text">Whisper model</span>
 				</label>
-				<select name="modelSize" bind:value={modelSize} class="select select-bordered">
+				<select name="modelSize" bind:value={modelSize} class="select select-bordered text-sm">
 					{#each models as m}
-						<option value={m}>{m}</option>
+						<option value={m.value}>{m.label}</option>
 					{/each}
 				</select>
 			</div>
