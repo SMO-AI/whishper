@@ -32,7 +32,9 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get -qq update \
     && apt-get -qq install --no-install-recommends \
     ffmpeg curl nodejs nginx supervisor build-essential python3-dev python3-pip libsndfile1 \
+    && ln -s /usr/bin/nodejs /usr/bin/node \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Install yt-dlp via pip (more reliable than wget from github)
 RUN python3 -m pip install --no-cache-dir --break-system-packages yt-dlp
