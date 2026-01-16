@@ -26,10 +26,10 @@ COPY ./frontend /app
 WORKDIR /app
 
 FROM frontend AS frontend-prod-deps
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --no-frozen-lockfile
 
 FROM frontend AS frontend-build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --no-frozen-lockfile
 ENV BODY_SIZE_LIMIT=0
 RUN pnpm run build
 
