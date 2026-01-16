@@ -30,7 +30,6 @@ services:
       LT_DISABLE_WEB_UI: "True"
       LT_UPDATE_MODELS: "True"
       LT_LOAD_ONLY: ${LT_LOAD_ONLY:-en,es,fr,ru}
-    user: root
     ports:
       - "5000:5000"
     healthcheck:
