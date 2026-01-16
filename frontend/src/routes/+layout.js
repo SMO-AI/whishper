@@ -8,10 +8,16 @@ import { supabase } from '$lib/supabase';
 /** @type {import('./$types').PageLoad} */
 export async function load({ fetch }) {
 	// Get Session
+	if (!supabase) {
+		console.warn('Supabase not initialized: PUBLIC_SUPABASE_URL or PUBLIC_SUPABASE_ANON_KEY missing');
+		return;
+	}
+
 	const {
 		data: { session }
 	} = await supabase.auth.getSession();
 	const accessToken = session?.access_token;
+
 
 	if (!accessToken) {
 		transcriptions.update((_) => []);

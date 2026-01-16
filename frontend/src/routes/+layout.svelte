@@ -6,6 +6,8 @@
 	import '../app.css';
 
 	onMount(async () => {
+		if (!supabase) return;
+
 		const {
 			data: { session }
 		} = await supabase.auth.getSession();
@@ -18,10 +20,10 @@
 		} else {
 			// Check and update user metadata if needed (fixes Google Auth profile creation)
 			const appMetadata = session.user.user_metadata.app;
-			if (appMetadata !== 'scriptus') {
+			if (appMetadata !== 'Scriptus') {
 				console.log('App metadata missing or incorrect, updating...');
 				await supabase.auth.updateUser({
-					data: { app: 'scriptus' }
+					data: { app: 'Scriptus' }
 				});
 			}
 

@@ -25,7 +25,7 @@
 				password,
 				options: {
 					data: {
-						app: 'scriptus'
+						app: 'Scriptus'
 					},
 					emailRedirectTo: window.location.origin + '/app'
 				}
