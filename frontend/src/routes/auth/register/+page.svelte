@@ -24,6 +24,9 @@
 				email,
 				password,
 				options: {
+					data: {
+						app: 'whishper'
+					},
 					emailRedirectTo: window.location.origin + '/app'
 				}
 			});

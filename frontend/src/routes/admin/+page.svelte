@@ -13,14 +13,15 @@
 		try {
 			// Fetch Profiles
 			const { data: profiles, error: profilesError } = await supabase
-				.from('profiles')
+				.from('whishper_profiles')
 				.select('*')
 				.order('created_at', { ascending: false });
 
 			if (profilesError) throw profilesError;
 
-			// Fetch Usage Logs
-			const { data: logs, error: logsError } = await supabase.from('usage_logs').select('*');
+			const { data: logs, error: logsError } = await supabase
+				.from('whishper_usage_logs')
+				.select('*');
 
 			if (logsError) throw logsError;
 
@@ -56,7 +57,7 @@
 			// Public profiles are viewable, so we can find ID by email.
 
 			const { data: targetProfile, error: searchError } = await supabase
-				.from('profiles')
+				.from('whishper_profiles')
 				.select('id')
 				.eq('email', newAdminEmail)
 				.single();
@@ -67,7 +68,7 @@
 			}
 
 			const { error } = await supabase
-				.from('profiles')
+				.from('whishper_profiles')
 				.update({ role: 'admin' })
 				.eq('id', targetProfile.id);
 
