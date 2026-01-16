@@ -30,10 +30,11 @@ FROM python:3.11-slim as base
 
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get -qq update \
-    && apt-get -qq install --no-install-recommends \
+    && apt-get -qq install --no-install-recommends -y \
     ffmpeg curl nodejs nginx supervisor build-essential python3-dev python3-pip libsndfile1 \
-    && ln -s /usr/bin/nodejs /usr/bin/node \
+    && ln -sf /usr/bin/nodejs /usr/bin/node \
     && rm -rf /var/lib/apt/lists/*
+
 
 
 # Install yt-dlp via pip (more reliable than wget from github)
