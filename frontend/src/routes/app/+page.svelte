@@ -13,8 +13,8 @@
 	import ErrorTranscription from '$lib/components/ErrorTranscription.svelte';
 	import ModalSubscription from '$lib/components/ModalSubscription.svelte';
 	import ModalSettings from '$lib/components/ModalSettings.svelte';
-	import { theme, locale, t } from '$lib/stores'; // locale and t will need re-export or direct import if not in stores.js
-	import { t as i18n_t } from '$lib/i18n'; // importing directly as I didn't add it to stores export yet
+	import { theme, locale, t, uploadProgress, transcriptions } from '$lib/stores';
+	// importing directly as I didn't add it to stores export yet
 
 	import { supabase } from '$lib/supabase';
 	import { goto } from '$app/navigation';
@@ -195,7 +195,7 @@
 								d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
 							/></svg
 						>
-						{$i18n_t('settings')}
+						{$t('settings')}
 					</button>
 				</li>
 				<li>
@@ -213,7 +213,7 @@
 								d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
 							/></svg
 						>
-						{$i18n_t('check_subscription')}
+						{$t('check_subscription')}
 					</button>
 				</li>
 				<div class="divider my-0" />
@@ -232,7 +232,7 @@
 								d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
 							/></svg
 						>
-						{$i18n_t('logout')}
+						{$t('logout')}
 					</button>
 				</li>
 			</ul>
@@ -264,8 +264,8 @@
 			class="flex flex-col md:flex-row items-center justify-between gap-6 mb-8 pb-8 border-b border-base-content/10"
 		>
 			<div class="text-center md:text-left">
-				<h3 class="text-2xl font-bold tracking-tight">{$i18n_t('your_library')}</h3>
-				<p class="text-sm opacity-60">{$i18n_t('manage_explore')}</p>
+				<h3 class="text-2xl font-bold tracking-tight">{$t('your_library')}</h3>
+				<p class="text-sm opacity-60">{$t('manage_explore')}</p>
 			</div>
 
 			<div class="flex items-center gap-4">
@@ -278,7 +278,7 @@
 						/>
 						<span
 							class="text-[10px] uppercase font-bold tracking-widest mt-1 opacity-60 animate-pulse"
-							>{$i18n_t('uploading')} {$uploadProgress}%</span
+							>{$t('uploading')} {$uploadProgress}%</span
 						>
 					</div>
 				{:else}
@@ -297,7 +297,7 @@
 							stroke-linejoin="round"
 							><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg
 						>
-						✨ {$i18n_t('new_transcription')}
+						✨ {$t('new_transcription')}
 					</button>
 				{/if}
 			</div>
@@ -337,9 +337,9 @@
 						><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg
 					>
 					<p class="text-2xl font-bold text-center tracking-tight italic">
-						{$i18n_t('collection_empty')}
+						{$t('collection_empty')}
 					</p>
-					<p class="text-sm">{$i18n_t('start_uploading')}</p>
+					<p class="text-sm">{$t('start_uploading')}</p>
 				</div>
 			{/if}
 		</div>

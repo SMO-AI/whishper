@@ -26,7 +26,7 @@
 		fetchLanguages();
 	};
 
-	import { t } from '$lib/i18n';
+	import { t } from '$lib/stores';
 
 	const handleTranslate = (id) => {
 		if (targetLanguage) {

@@ -3,6 +3,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { deleteTranscription } from '$lib/utils.js';
 	import { fade } from 'svelte/transition';
+	import { t, theme } from '$lib/stores';
 	export let tr;
 
 	const dispatch = createEventDispatcher();

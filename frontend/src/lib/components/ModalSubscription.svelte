@@ -2,6 +2,7 @@
 	import { supabase } from '$lib/supabase';
 	import toast from 'svelte-french-toast';
 	import { onMount } from 'svelte';
+	import { t } from '$lib/stores';
 
 	export let show = false;
 	let code = '';

@@ -1,5 +1,6 @@
 <script>
 	import { fade } from 'svelte/transition';
+	import { t } from '$lib/stores';
 	export let tr;
 	$: fileName = tr.fileName ? tr.fileName.split('_WHSHPR_')[1] : 'Initializing...';
 </script>
@@ -19,7 +20,7 @@
 				<span class="loading loading-dots loading-md" />
 			</div>
 			<span class="text-[10px] font-bold uppercase tracking-wider opacity-60 italic text-secondary"
-				>Translating</span
+				>{$t('translating')}</span
 			>
 		</div>
 
@@ -30,7 +31,7 @@
 					{fileName}
 				</h3>
 				<div class="badge badge-secondary badge-outline badge-sm font-bold uppercase text-[10px]">
-					Processing
+					{$t('pending')}
 				</div>
 			</div>
 			<p class="text-sm font-mono opacity-50">

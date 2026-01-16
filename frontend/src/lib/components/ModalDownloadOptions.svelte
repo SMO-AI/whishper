@@ -1,7 +1,9 @@
 <script>
 	import { downloadSRT, downloadTXT, downloadJSON, downloadVTT, CLIENT_API_HOST } from '$lib/utils';
 	import { supabase } from '$lib/supabase';
+	import { t } from '$lib/stores';
 	import toast from 'svelte-french-toast';
+
 	export let tr;
 
 	let subtitleFormat = 'srt';

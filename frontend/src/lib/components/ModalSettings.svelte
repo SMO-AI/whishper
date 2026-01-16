@@ -2,7 +2,8 @@
 	import { supabase } from '$lib/supabase';
 	import toast from 'svelte-french-toast';
 	import { onMount } from 'svelte';
-	import { locale, t } from '$lib/i18n';
+	import { locale, t } from '$lib/stores';
+
 	import { writable } from 'svelte/store';
 
 	export let show = false;

@@ -1,7 +1,7 @@
 <script>
 	import { validateURL, CLIENT_API_HOST } from '$lib/utils.js';
 	import { env } from '$env/dynamic/public';
-	import { uploadProgress } from '$lib/stores';
+	import { uploadProgress, t } from '$lib/stores';
 	import { supabase } from '$lib/supabase'; // Import Supabase
 	import { tick } from 'svelte';
 

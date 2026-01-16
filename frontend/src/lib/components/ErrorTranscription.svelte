@@ -1,6 +1,7 @@
 <script>
 	import { deleteTranscription } from '$lib/utils.js';
 	import { fade } from 'svelte/transition';
+	import { t } from '$lib/stores';
 	export let tr;
 </script>
 
@@ -33,7 +34,7 @@
 					<line x1="6" y1="6" x2="18" y2="18" />
 				</svg>
 			</div>
-			<span class="text-[10px] font-bold uppercase tracking-wider text-error">Failed</span>
+			<span class="text-[10px] font-bold uppercase tracking-wider text-error">{$t('error')}</span>
 		</div>
 
 		<!-- Content Column -->
@@ -42,7 +43,7 @@
 				<h3 class="text-lg font-bold text-error/80 truncate max-w-md">
 					id-{tr.id}
 				</h3>
-				<div class="badge badge-error badge-sm font-bold uppercase text-[10px]">Error</div>
+				<div class="badge badge-error badge-sm font-bold uppercase text-[10px]">{$t('error')}</div>
 			</div>
 			<p class="text-sm font-mono text-error/60">
 				Transcription crashed or failed to initialize. Please check logs or try a different model.
@@ -66,9 +67,9 @@
 					stroke-linejoin="round"
 					><polyline points="3 6 5 6 21 6" /><path
 						d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
-					/></svg
+					/><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg
 				>
-				Remove
+				{$t('delete')}
 			</button>
 		</div>
 	</div>
