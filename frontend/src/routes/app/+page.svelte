@@ -12,7 +12,9 @@
 	import PendingTranslation from '$lib/components/PendingTranslation.svelte';
 	import ErrorTranscription from '$lib/components/ErrorTranscription.svelte';
 	import ModalSubscription from '$lib/components/ModalSubscription.svelte';
-	import { theme } from '$lib/stores';
+	import ModalSettings from '$lib/components/ModalSettings.svelte';
+	import { theme, locale, t } from '$lib/stores'; // locale and t will need re-export or direct import if not in stores.js
+	import { t as i18n_t } from '$lib/i18n'; // importing directly as I didn't add it to stores export yet
 
 	import { supabase } from '$lib/supabase';
 	import { goto } from '$app/navigation';
@@ -103,6 +105,7 @@
 		}
 	});
 	let modalSubscription;
+	let modalSettings;
 </script>
 
 <Toaster />
@@ -110,6 +113,7 @@
 <ModalTranslationForm tr={translateTranscription} />
 <ModalTranscriptionForm />
 <ModalSubscription bind:this={modalSubscription} />
+<ModalSettings bind:this={modalSettings} />
 
 <header class="py-12 bg-gradient-to-b from-primary/5 to-transparent relative">
 	<div class="absolute top-4 right-4 md:top-8 md:right-8 flex items-center gap-2">
@@ -172,17 +176,24 @@
 				class="dropdown-content z-[1] menu p-2 shadow-lg bg-base-100 rounded-box w-52 mt-4 border border-base-200"
 			>
 				<li>
-					<button class="justify-between">
-						Edit Profile
+					<button class="justify-between" on:click={() => modalSettings.showModal('profile')}>
+						{$i18n_t('edit_profile')}
 						<span class="badge badge-sm badge-ghost">New</span>
 					</button>
 				</li>
-				<li><button>Settings</button></li>
-				<li><button on:click={() => modalSubscription.showModal()}>Check Subscription</button></li>
+				<li>
+					<button on:click={() => modalSettings.showModal('settings')}>{$i18n_t('settings')}</button
+					>
+				</li>
+				<li>
+					<button on:click={() => modalSubscription.showModal()}
+						>{$i18n_t('check_subscription')}</button
+					>
+				</li>
 				<div class="divider my-0" />
 				<li>
 					<button class="text-error font-medium hover:bg-error/10" on:click={handleLogout}
-						>Logout</button
+						>{$i18n_t('logout')}</button
 					>
 				</li>
 			</ul>
@@ -214,8 +225,8 @@
 			class="flex flex-col md:flex-row items-center justify-between gap-6 mb-8 pb-8 border-b border-base-content/10"
 		>
 			<div class="text-center md:text-left">
-				<h3 class="text-2xl font-bold tracking-tight">Your Library</h3>
-				<p class="text-sm opacity-60">Manage and explore your transcriptions</p>
+				<h3 class="text-2xl font-bold tracking-tight">{$i18n_t('your_library')}</h3>
+				<p class="text-sm opacity-60">{$i18n_t('manage_explore')}</p>
 			</div>
 
 			<div class="flex items-center gap-4">
@@ -228,7 +239,7 @@
 						/>
 						<span
 							class="text-[10px] uppercase font-bold tracking-widest mt-1 opacity-60 animate-pulse"
-							>Uploading {$uploadProgress}%</span
+							>{$i18n_t('uploading')} {$uploadProgress}%</span
 						>
 					</div>
 				{:else}
@@ -247,7 +258,7 @@
 							stroke-linejoin="round"
 							><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg
 						>
-						✨ New Transcription
+						✨ {$i18n_t('new_transcription')}
 					</button>
 				{/if}
 			</div>
@@ -287,9 +298,9 @@
 						><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg
 					>
 					<p class="text-2xl font-bold text-center tracking-tight italic">
-						Your collection is empty
+						{$i18n_t('collection_empty')}
 					</p>
-					<p class="text-sm">Start by uploading your first audio file</p>
+					<p class="text-sm">{$i18n_t('start_uploading')}</p>
 				</div>
 			{/if}
 		</div>

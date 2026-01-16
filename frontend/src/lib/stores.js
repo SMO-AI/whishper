@@ -30,3 +30,6 @@ export const currentVideoPlayerTime = writable(0);
 
 // App Theme
 export const theme = writable("light");
+
+// Locale
+export const locale = writable("ru");
