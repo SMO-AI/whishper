@@ -1,8 +1,6 @@
 package api
 
 import (
-	"os"
-
 	"github.com/goccy/go-json"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
@@ -18,7 +16,7 @@ type Server struct {
 	Router             *fiber.App
 	Db                 database.Db
 	NewTranscriptionCh chan bool
-	clients            []*websocket.Conn
+	clients            map[string][]*websocket.Conn
 }
 
 func NewServer(listenAddr string, db database.Db) *Server {
@@ -31,7 +29,7 @@ func NewServer(listenAddr string, db database.Db) *Server {
 			ServerHeader: "Fiber",              // Optional, for easier debugging
 		}),
 		Db:                 db,
-		clients:            make([]*websocket.Conn, 0),
+		clients:            make(map[string][]*websocket.Conn),
 		NewTranscriptionCh: make(chan bool, 100),
 	}
 }
@@ -45,9 +43,21 @@ func (s *Server) Run() {
 
 func (s *Server) SetupWebsocket() {
 	s.Router.Get("/ws/transcriptions", websocket.New(func(c *websocket.Conn) {
+		token := c.Query("token")
+		user, err := ValidateToken(token)
+		if err != nil {
+			log.Error().Err(err).Msg("Invalid websocket token")
+			c.Close()
+			return
+		}
+		userID := user.ID
 
-		// Add this connection to the slice of clients
-		s.clients = append(s.clients, c)
+		// Add this connection to the slice of clients for this user
+		if s.clients[userID] == nil {
+			s.clients[userID] = make([]*websocket.Conn, 0)
+		}
+		s.clients[userID] = append(s.clients[userID], c)
+		log.Debug().Msgf("New websocket client connected for user %s", userID)
 
 		for {
 			_, msg, err := c.ReadMessage()
@@ -58,7 +68,7 @@ func (s *Server) SetupWebsocket() {
 					log.Debug().Err(err).Msgf("Error reading message")
 				}
 				// Remove the client from the slice if it has disconnected
-				s.clients = removeWsClient(s.clients, c)
+				s.clients[userID] = removeWsClient(s.clients[userID], c)
 				return
 			}
 			s.handleWebsocketMessage(c, msg)
@@ -73,10 +83,15 @@ func (s *Server) BroadcastTranscription(t *models.Transcription) {
 		log.Error().Err(err).Msg("Error marshalling transcription to JSON:")
 		return
 	}
-	for _, client := range s.clients {
-		if err := client.WriteMessage(websocket.TextMessage, json); err != nil {
-			log.Error().Err(err).Msg("Error broadcasting message:")
+	// Broadcast only to the user
+	if clients, ok := s.clients[t.UserID]; ok {
+		for _, client := range clients {
+			if err := client.WriteMessage(websocket.TextMessage, json); err != nil {
+				log.Error().Err(err).Msg("Error broadcasting message:")
+			}
 		}
+	} else {
+		log.Debug().Msgf("No connected clients for user %s, skipping broadcast", t.UserID)
 	}
 }
 
@@ -86,7 +101,15 @@ func (s *Server) SetupMiddleware() {
 
 func (s *Server) RegisterRoutes() {
 	// Static routes
-	s.Router.Static("/api/video", os.Getenv("UPLOAD_DIR"))
+	// Static routes
+	// s.Router.Static("/api/video", os.Getenv("UPLOAD_DIR"))
+	s.Router.Get("/api/video/:filename", func(c *fiber.Ctx) error {
+		err := s.handleDownloadFile(c)
+		if err != nil {
+			log.Error().Err(err).Msg("Error handling GET /api/video/:filename")
+		}
+		return err
+	})
 
 	// Register HTTP route for getting initial state.
 	s.Router.Get("/api/transcriptions", func(c *fiber.Ctx) error {

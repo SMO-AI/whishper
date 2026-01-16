@@ -101,12 +101,13 @@ func (m *MongoDb) NewTranscription(t *models.Transcription) (*models.Transcripti
 	return t, nil
 }
 
-func (s *MongoDb) GetAllTranscriptions() []*models.Transcription {
+func (s *MongoDb) GetAllTranscriptions(userID string) []*models.Transcription {
 	collection := s.client.Database("whishper").Collection("transcriptions")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	cursor, err := collection.Find(ctx, bson.D{})
+	filter := bson.D{primitive.E{Key: "userId", Value: userID}}
+	cursor, err := collection.Find(ctx, filter)
 	if err != nil {
 		log.Printf("Error getting transcriptions: %v", err)
 		return nil

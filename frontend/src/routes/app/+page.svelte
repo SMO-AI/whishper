@@ -30,7 +30,7 @@
 	let socket;
 	export let data;
 
-	function connect() {
+	function connect(token) {
 		if (!browser) {
 			console.log('Server, not connecting');
 			return;
@@ -44,7 +44,7 @@
 			new_uri = 'ws:';
 		}
 		new_uri += '//' + (CLIENT_WS_HOST == '' ? loc.host : CLIENT_WS_HOST);
-		new_uri += '/ws/transcriptions';
+		new_uri += '/ws/transcriptions?token=' + token;
 		console.log('Connecting to: ', new_uri);
 		socket = new WebSocket(new_uri);
 
@@ -54,7 +54,7 @@
 			console.log('WebSocket is closed with code: ', event.code, ' and reason: ', event.reason);
 			setTimeout(() => {
 				console.log('Reconnecting...');
-				connect();
+				connect(token);
 			}, 1000);
 		};
 
@@ -83,7 +83,7 @@
 			goto('/auth/login');
 			return;
 		}
-		connect();
+		connect(session.access_token);
 	});
 
 	let downloadTranscription = null;

@@ -13,7 +13,20 @@ import (
 )
 
 func (s *Server) handleGetAllTranscriptions(c *fiber.Ctx) error {
-	transcriptions := s.Db.GetAllTranscriptions()
+	token := c.Get("Authorization")
+	if len(token) > 7 && token[:7] == "Bearer " {
+		token = token[7:]
+	} else {
+		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	}
+
+	user, err := ValidateToken(token)
+	if err != nil {
+		log.Error().Err(err).Msg("Invalid token")
+		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	}
+
+	transcriptions := s.Db.GetAllTranscriptions(user.ID)
 
 	// Convert the transcriptions to JSON.
 	json, err := json.Marshal(transcriptions)
@@ -29,11 +42,27 @@ func (s *Server) handleGetAllTranscriptions(c *fiber.Ctx) error {
 }
 
 func (s *Server) handleGetTranscriptionById(c *fiber.Ctx) error {
+	token := c.Get("Authorization")
+	if len(token) > 7 && token[:7] == "Bearer " {
+		token = token[7:]
+	} else {
+		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	}
+
+	user, err := ValidateToken(token)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	}
+
 	id := c.Params("id")
 	t := s.Db.GetTranscription(id)
 	if t == nil {
 		log.Warn().Msgf("Transcription with id %v not found", id)
 		return fiber.NewError(fiber.StatusNotFound, "Not found")
+	}
+
+	if t.UserID != user.ID {
+		return fiber.NewError(fiber.StatusForbidden, "Forbidden")
 	}
 
 	// Convert the transcription to JSON.
@@ -54,7 +83,31 @@ func (s *Server) handleGetTranscriptionById(c *fiber.Ctx) error {
 // broadcasts the new transcription to all ws clients.
 func (s *Server) handlePostTranscription(c *fiber.Ctx) error {
 	log.Debug().Msg("POST /api/transcriptions")
+
+	token := c.Get("Authorization")
+	if len(token) > 7 && token[:7] == "Bearer " {
+		token = token[7:]
+	} else {
+		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	}
+
+	user, err := ValidateToken(token)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	}
+
+	// Check if user is active
+	active, err := CheckUserActive(token)
+	if err != nil {
+		log.Error().Err(err).Msg("Error checking user active status")
+		return fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+	if !active {
+		return fiber.NewError(fiber.StatusForbidden, "Subscription required")
+	}
+
 	var transcription models.Transcription
+	transcription.UserID = user.ID
 
 	// we get the filename from the from
 	var filename string
@@ -122,6 +175,18 @@ func (s *Server) handlePostTranscription(c *fiber.Ctx) error {
 }
 
 func (s *Server) handleDeleteTranscription(c *fiber.Ctx) error {
+	token := c.Get("Authorization")
+	if len(token) > 7 && token[:7] == "Bearer " {
+		token = token[7:]
+	} else {
+		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	}
+
+	user, err := ValidateToken(token)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	}
+
 	// First get the transcription from the database
 	id := c.Params("id")
 	t := s.Db.GetTranscription(id)
@@ -130,8 +195,12 @@ func (s *Server) handleDeleteTranscription(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusNotFound, "Not found")
 	}
 
+	if t.UserID != user.ID {
+		return fiber.NewError(fiber.StatusForbidden, "Forbidden")
+	}
+
 	// Then delete the file from disk
-	err := os.Remove(fmt.Sprintf("%v/%v", os.Getenv("UPLOAD_DIR"), t.FileName))
+	err = os.Remove(fmt.Sprintf("%v/%v", os.Getenv("UPLOAD_DIR"), t.FileName))
 	if err != nil {
 		log.Error().Err(err).Msgf("Error deleting file %v", t.FileName)
 	}
@@ -183,17 +252,36 @@ func (s *Server) handlePatchTranscription(c *fiber.Ctx) error {
 }
 
 func (s *Server) handleTranslate(c *fiber.Ctx) error {
+	token := c.Get("Authorization")
+	if len(token) > 7 && token[:7] == "Bearer " {
+		token = token[7:]
+	} else {
+		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	}
+
+	user, err := ValidateToken(token)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	}
+
 	id := c.Params("id")
 	targetLang := c.Params("target")
 
 	transcription := s.Db.GetTranscription(id)
+	if transcription == nil {
+		return fiber.NewError(fiber.StatusNotFound, "Not found")
+	}
+
+	if transcription.UserID != user.ID {
+		return fiber.NewError(fiber.StatusForbidden, "Forbidden")
+	}
 
 	// Set status as translating
 	transcription.Status = models.TrannscriptionStatusTranslating
 	s.Db.UpdateTranscription(transcription)
 	s.BroadcastTranscription(transcription)
 
-	err := transcription.Translate(targetLang)
+	err = transcription.Translate(targetLang)
 	if err != nil {
 		log.Debug().Err(err).Msg("Error with translation")
 		return err
@@ -204,4 +292,65 @@ func (s *Server) handleTranslate(c *fiber.Ctx) error {
 	s.Db.UpdateTranscription(transcription)
 	s.BroadcastTranscription(transcription)
 	return nil
+}
+
+func (s *Server) handleDownloadFile(c *fiber.Ctx) error {
+	token := c.Get("Authorization")
+	if len(token) > 7 && token[:7] == "Bearer " {
+		token = token[7:]
+	} else {
+		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	}
+
+	user, err := ValidateToken(token)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	}
+
+	filename := c.Params("filename")
+	if filename == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "Bad Request")
+	}
+
+	// Security: Prevent path traversal
+	if filename == "." || filename == ".." || filename[0] == '/' || filename[0] == '\\' {
+		return fiber.NewError(fiber.StatusForbidden, "Forbidden")
+	}
+
+	// We need to check if the file belongs to the user.
+	// Since we don't have an easy lookup by filename in DB interface, we have to iterate or add a method.
+	// Adding GetTranscriptionByFilename to DB interface is better, but for now we iterate (inefficient but safe) or trust the filename structure if it contains user ID?
+	// Filename structure: timeid_WHSHPR_filename. It doesn't contain UserID.
+	// So we must look up in DB.
+
+	// Ideally execute a finding query.
+	// For now, let's implement GetTranscriptionByFilename or similar.
+	// Or use GetAllTranscriptions(userID) and check if filename is in there.
+
+	transcriptions := s.Db.GetAllTranscriptions(user.ID)
+	found := false
+	for _, t := range transcriptions {
+		if t.FileName == filename {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		// Try pending?
+		pending := s.Db.GetPendingTranscriptions()
+		for _, t := range pending {
+			if t.UserID == user.ID && t.FileName == filename {
+				found = true
+				break
+			}
+		}
+	}
+
+	if !found {
+		return fiber.NewError(fiber.StatusForbidden, "Forbidden")
+	}
+
+	filepath := fmt.Sprintf("%v/%v", os.Getenv("UPLOAD_DIR"), filename)
+	return c.SendFile(filepath)
 }

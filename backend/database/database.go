@@ -9,6 +9,6 @@ type Db interface {
 	UpdateTranscription(*models.Transcription) (*models.Transcription, error)
 	DeleteTranscription(string) error
 	GetTranscription(string) *models.Transcription
-	GetAllTranscriptions() []*models.Transcription
+	GetAllTranscriptions(string) []*models.Transcription
 	GetPendingTranscriptions() []*models.Transcription
 }

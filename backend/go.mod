@@ -3,7 +3,7 @@ module codeberg.org/pluja/whishper
 go 1.20
 
 require (
-	github.com/goccy/go-json v0.10.2
+	github.com/goccy/go-json v0.10.5
 	github.com/gofiber/contrib/websocket v1.2.0
 	github.com/gofiber/fiber/v2 v2.50.0
 	github.com/rs/zerolog v1.30.0
