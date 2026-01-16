@@ -29,7 +29,7 @@ services:
     environment:
       LT_DISABLE_WEB_UI: "True"
       LT_UPDATE_MODELS: "True"
-      LT_LOAD_ONLY: ${LT_LOAD_ONLY:-en,es,fr}
+      LT_LOAD_ONLY: ${LT_LOAD_ONLY:-en,es,fr,ru}
     expose:
       - 5000
     healthcheck:
