@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import { locale as i18n_locale, t as i18n_t } from './i18n';
 
 // contains all transcriptions
 export const transcriptions = writable([]);
@@ -10,7 +11,6 @@ export const currentTranscription = writable();
 export const downloadTranscription = writable(null);
 
 // Editor history
-
 export const editorHistory = writable([]);
 
 // Upload progress and status
@@ -25,12 +25,11 @@ export let editorSettings = writable({
 });
 
 // Video player settings
-// Video player settings
 export const currentVideoPlayerTime = writable(0);
 
 // App Theme
 export const theme = writable('light');
 
 // Internationalization
-export { locale, t } from './i18n';
-
+export const locale = i18n_locale;
+export const t = i18n_t;

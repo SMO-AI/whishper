@@ -1,6 +1,6 @@
 <script>
 	import { Toaster } from 'svelte-french-toast';
-	import { transcriptions, uploadProgress } from '$lib/stores';
+	import { transcriptions, uploadProgress, theme, locale, t } from '$lib/stores';
 	import { browser, dev } from '$app/environment';
 	import { CLIENT_WS_HOST } from '$lib/utils';
 	import { onMount, onDestroy } from 'svelte';
@@ -13,9 +13,6 @@
 	import ErrorTranscription from '$lib/components/ErrorTranscription.svelte';
 	import ModalSubscription from '$lib/components/ModalSubscription.svelte';
 	import ModalSettings from '$lib/components/ModalSettings.svelte';
-	import { theme, locale, t, uploadProgress, transcriptions } from '$lib/stores';
-	// importing directly as I didn't add it to stores export yet
-
 	import { supabase } from '$lib/supabase';
 	import { goto } from '$app/navigation';
 
