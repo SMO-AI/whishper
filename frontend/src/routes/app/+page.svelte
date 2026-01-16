@@ -30,9 +30,13 @@
 	export let data;
 
 	function connect(token) {
-		if (!browser) {
-			console.log('Server, not connecting');
-			return;
+		if (!browser) return;
+
+		// Close existing socket if any
+		if (socket) {
+			console.log('Closing existing socket...');
+			socket.onclose = null; // Prevent reconnection loop from old socket
+			socket.close();
 		}
 
 		let new_uri = '';
@@ -44,17 +48,19 @@
 		}
 		new_uri += '//' + (CLIENT_WS_HOST == '' ? loc.host : CLIENT_WS_HOST);
 		new_uri += '/ws/transcriptions?token=' + token;
-		console.log('Connecting to: ', new_uri);
+
+		console.log('Connecting to WebSocket...');
 		socket = new WebSocket(new_uri);
 
-		socket.onopen = () => console.log('WebSocket is connected...');
-		socket.onerror = (error) => console.log('WebSocket Error: ', error);
+		socket.onopen = () => console.log('WebSocket connected');
+		socket.onerror = (error) => console.log('WebSocket connection error');
 		socket.onclose = (event) => {
-			console.log('WebSocket is closed with code: ', event.code, ' and reason: ', event.reason);
-			setTimeout(() => {
-				console.log('Reconnecting...');
-				connect(token);
-			}, 1000);
+			if (event.code !== 1000) {
+				console.log(`WebSocket closed (code: ${event.code}). Reconnecting...`);
+				setTimeout(() => connect(token), 3000);
+			} else {
+				console.log('WebSocket closed normally');
+			}
 		};
 
 		socket.onmessage = (event) => {
@@ -103,6 +109,37 @@
 	});
 	let modalSubscription;
 	let modalSettings;
+
+	let cloudAnimation = '';
+	const cloudAnimations = [
+		'animate-cloud-bounce',
+		'animate-cloud-shake',
+		'animate-cloud-spin',
+		'animate-cloud-pulse',
+		'animate-cloud-wobble',
+		'animate-cloud-rubber',
+		'animate-cloud-tada',
+		'animate-cloud-jello'
+	];
+	let lastAnimationIndex = -1;
+
+	function triggerCloudAnimation() {
+		// If already animating, don't trigger another one
+		if (cloudAnimation) return;
+
+		let index;
+		do {
+			index = Math.floor(Math.random() * cloudAnimations.length);
+		} while (index === lastAnimationIndex);
+
+		lastAnimationIndex = index;
+		cloudAnimation = cloudAnimations[index];
+
+		// Reset animation class after completion to allow re-triggering
+		setTimeout(() => {
+			cloudAnimation = '';
+		}, 1000);
+	}
 </script>
 
 <Toaster />
@@ -236,12 +273,20 @@
 		</div>
 	</div>
 	<div class="flex flex-col items-center justify-center space-y-4">
-		<div class="relative group">
+		<button
+			on:click={triggerCloudAnimation}
+			class="relative group focus:outline-none transition-transform active:scale-95"
+			aria-label="Click for a surprise"
+		>
 			<div
-				class="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"
+				class="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-full blur opacity-25 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"
 			/>
-			<img class="relative w-24 h-24" src="/logo.svg" alt="Logo: a cloud whispering" />
-		</div>
+			<img
+				class="relative w-24 h-24 cursor-pointer select-none transition-all duration-300 hover:scale-110 {cloudAnimation}"
+				src="/logo.svg"
+				alt="Logo: a cloud whispering"
+			/>
+		</button>
 		<h1
 			class="text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary"
 		>
@@ -342,3 +387,210 @@
 		</div>
 	</div>
 </main>
+
+<style>
+	/* Cloud Animations */
+	.animate-cloud-bounce {
+		animation: cloud-bounce 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+	}
+
+	/* Subtle float animation on hover */
+	.group:hover img:not([class*='animate-cloud-']) {
+		animation: cloud-float 3s ease-in-out infinite;
+	}
+
+	@keyframes cloud-float {
+		0%,
+		100% {
+			transform: translateY(0) rotate(0deg);
+		}
+		25% {
+			transform: translateY(-4px) rotate(1deg);
+		}
+		75% {
+			transform: translateY(-2px) rotate(-1deg);
+		}
+	}
+
+	.animate-cloud-shake {
+		animation: cloud-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+	}
+	.animate-cloud-spin {
+		animation: cloud-spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+	}
+	.animate-cloud-pulse {
+		animation: cloud-pulse 0.5s ease-in-out both;
+	}
+	.animate-cloud-wobble {
+		animation: cloud-wobble 0.8s ease-in-out both;
+	}
+	.animate-cloud-rubber {
+		animation: cloud-rubber 0.8s ease-in-out both;
+	}
+	.animate-cloud-tada {
+		animation: cloud-tada 0.8s ease-in-out both;
+	}
+	.animate-cloud-jello {
+		animation: cloud-jello 0.8s ease-in-out both;
+	}
+
+	@keyframes cloud-bounce {
+		0%,
+		20%,
+		50%,
+		80%,
+		100% {
+			transform: translateY(0);
+		}
+		40% {
+			transform: translateY(-30px) scaleY(1.1);
+		}
+		60% {
+			transform: translateY(-15px) scaleY(1.05);
+		}
+	}
+
+	@keyframes cloud-shake {
+		10%,
+		90% {
+			transform: translate3d(-1px, 0, 0);
+		}
+		20%,
+		80% {
+			transform: translate3d(2px, 0, 0);
+		}
+		30%,
+		50%,
+		70% {
+			transform: translate3d(-4px, 0, 0);
+		}
+		40%,
+		60% {
+			transform: translate3d(4px, 0, 0);
+		}
+	}
+
+	@keyframes cloud-spin {
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	@keyframes cloud-pulse {
+		0% {
+			transform: scale(1);
+		}
+		50% {
+			transform: scale(1.3);
+			filter: brightness(1.2);
+		}
+		100% {
+			transform: scale(1);
+		}
+	}
+
+	@keyframes cloud-wobble {
+		0% {
+			transform: translateX(0%);
+		}
+		15% {
+			transform: translateX(-25%) rotate(-5deg);
+		}
+		30% {
+			transform: translateX(20%) rotate(3deg);
+		}
+		45% {
+			transform: translateX(-15%) rotate(-3deg);
+		}
+		60% {
+			transform: translateX(10%) rotate(2deg);
+		}
+		75% {
+			transform: translateX(-5%) rotate(-1deg);
+		}
+		100% {
+			transform: translateX(0%);
+		}
+	}
+
+	@keyframes cloud-rubber {
+		0% {
+			transform: scale3d(1, 1, 1);
+		}
+		30% {
+			transform: scale3d(1.25, 0.75, 1);
+		}
+		40% {
+			transform: scale3d(0.75, 1.25, 1);
+		}
+		50% {
+			transform: scale3d(1.15, 0.85, 1);
+		}
+		65% {
+			transform: scale3d(0.95, 1.05, 1);
+		}
+		75% {
+			transform: scale3d(1.05, 0.95, 1);
+		}
+		100% {
+			transform: scale3d(1, 1, 1);
+		}
+	}
+
+	@keyframes cloud-tada {
+		0% {
+			transform: scale3d(1, 1, 1);
+		}
+		10%,
+		20% {
+			transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, -3deg);
+		}
+		30%,
+		50%,
+		70%,
+		90% {
+			transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg);
+		}
+		40%,
+		60%,
+		80% {
+			transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg);
+		}
+		100% {
+			transform: scale3d(1, 1, 1);
+		}
+	}
+
+	@keyframes cloud-jello {
+		11.1% {
+			transform: skewX(-12.5deg) skewY(-12.5deg);
+		}
+		22.2% {
+			transform: skewX(6.25deg) skewY(6.25deg);
+		}
+		33.3% {
+			transform: skewX(-3.125deg) skewY(-3.125deg);
+		}
+		44.4% {
+			transform: skewX(1.5625deg) skewY(1.5625deg);
+		}
+		55.5% {
+			transform: skewX(-0.78125deg) skewY(-0.78125deg);
+		}
+		66.6% {
+			transform: skewX(0.390625deg) skewY(0.390625deg);
+		}
+		77.7% {
+			transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
+		}
+		88.8% {
+			transform: skewX(0.09765625deg) skewY(0.09765625deg);
+		}
+		100% {
+			transform: skewX(0) skewY(0);
+		}
+	}
+</style>

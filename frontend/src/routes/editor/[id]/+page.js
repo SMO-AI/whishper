@@ -4,7 +4,7 @@ import { browser } from '$app/environment';
 import { env } from '$env/dynamic/public';
 import { supabase } from '$lib/supabase';
 
-export async function load({ params }) {
+export async function load({ params, fetch }) {
 	let id = params.id;
 
 	// Use different endpoints for server-side and client-side
@@ -32,11 +32,11 @@ export async function load({ params }) {
 			currentTranscription.set(ts);
 			return { transcription: ts };
 		} else {
-			console.error('Failed to fetch transcription for editor:', response.status);
-			return { error: 'Unauthorized' };
+			console.error(`Failed to fetch transcription for editor (${id}):`, response.status);
+			return { error: 'Unauthorized', transcription: null };
 		}
 	} catch (err) {
 		console.error('Network error fetching transcription for editor:', err);
-		return { error: 'Network Error' };
+		return { error: 'Network Error', transcription: null };
 	}
 }
