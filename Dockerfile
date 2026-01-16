@@ -59,12 +59,12 @@ COPY --from=backend-builder /app/whishper /bin/whishper
 RUN chmod a+rx /bin/whishper
 COPY --from=ytdlp_cache /usr/local/bin/yt-dlp /bin/yt-dlp
 
+WORKDIR /app
+RUN mkdir -p uploads models
+
 # Nginx setup
 COPY ./nginx.conf /etc/nginx/nginx.conf
 
-# Set workdir and entrypoint
-WORKDIR /app
-RUN mkdir /app/uploads
 
 # Cleanup to make the image smaller
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* ~/.cache /var/cache

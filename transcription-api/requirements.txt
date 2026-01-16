@@ -5,4 +5,5 @@ python-dotenv
 uvicorn
 python-multipart
 ffmpeg-python
-soundfilegroq
+soundfile
+groq
