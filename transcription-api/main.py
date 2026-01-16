@@ -45,9 +45,9 @@ async def upload_to_s3(file_path: str, object_name: str) -> str | None:
         print(f"S3 Upload Error: {e}")
         return None
 
-async def get_current_user(authorization: Annotated[str | None, Header()] = None) -> UserContext:
+async def get_current_user(authorization: Annotated[str | None, Header()] = None) -> UserContext | None:
     if not authorization:
-        raise HTTPException(status_code=401, detail="Missing Authorization Header")
+        return None
     
     try:
         token = authorization.replace("Bearer ", "")
@@ -55,7 +55,7 @@ async def get_current_user(authorization: Annotated[str | None, Header()] = None
         return UserContext(user=user.user, token=token)
     except Exception as e:
         print(f"Auth Error: {e}")
-        raise HTTPException(status_code=401, detail="Invalid Token")
+        return None
 
 @app.post("/transcribe/")
 async def transcribe_endpoint(
