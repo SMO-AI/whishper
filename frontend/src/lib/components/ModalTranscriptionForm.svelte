@@ -2,59 +2,34 @@
 	import { validateURL, CLIENT_API_HOST } from '$lib/utils.js';
 	import { env } from '$env/dynamic/public';
 	import { uploadProgress } from '$lib/stores';
+	import { supabase } from '$lib/supabase'; // Import Supabase
 
 	import toast from 'svelte-french-toast';
 
 	let errorMessage = '';
 	let disableSubmit = true;
-	let modelSize = 'medium'; // Default to medium as requested
+	let modelSize = 'groq:whisper-large-v3'; // Default to Groq V3 as requested
 	let language = 'auto';
 	let sourceUrl = '';
 	let fileInput;
 	let device = env.PUBLIC_WHISHPER_PROFILE == 'gpu' ? 'cuda' : 'cpu';
 	let task = 'transcribe';
-	let activeTab = 'file'; // 'file' or 'url'
+	let activeTab = 'file'; // 'file' or 'url';
 
 	let languages = [
-		'auto',
-		'ar',
-		'be',
-		'bg',
-		'bn',
-		'ca',
-		'cs',
-		'cy',
-		'da',
-		'de',
-		'el',
-		'en',
-		'es',
-		'fr',
-		'it',
-		'ja',
-		'nl',
-		'pl',
-		'pt',
-		'ru',
-		'sk',
-		'sl',
-		'sv',
-		'tk',
-		'tr',
-		'zh'
+		{ value: 'auto', label: 'Auto Detect' },
+		{ value: 'ru', label: 'Russian' },
+		{ value: 'en', label: 'English' },
+		{ value: 'es', label: 'Spanish' },
+		{ value: 'fr', label: 'French' }
 	];
+	// Models defined below
 	let models = [
 		{ value: 'medium', label: 'Whisper Medium' },
 		{ value: 'groq:distil-whisper-large-v3-en', label: 'Groq Distil Whisper Large V3 (EN)' },
 		{ value: 'groq:whisper-large-v3', label: 'Groq Whisper Large V3' },
 		{ value: 'groq:whisper-large-v3-turbo', label: 'Groq Whisper Large V3 Turbo' }
 	];
-	// Sort the languages
-	languages.sort((a, b) => {
-		if (a == 'auto') return -1;
-		if (b == 'auto') return 1;
-		return a.localeCompare(b);
-	});
 
 	// Function that sends the data as a form to the backend
 	async function sendForm() {
@@ -81,6 +56,12 @@
 		if (sourceUrl == '' && fileInput && fileInput.files.length > 0) {
 			formData.append('file', fileInput.files[0]);
 		}
+
+		// Get Session
+		const {
+			data: { session }
+		} = await supabase.auth.getSession();
+		const accessToken = session?.access_token;
 
 		return new Promise((resolve, reject) => {
 			const xhr = new XMLHttpRequest();
@@ -115,6 +96,9 @@
 			});
 
 			xhr.open('POST', `${CLIENT_API_HOST}/api/transcriptions`);
+			if (accessToken) {
+				xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+			}
 			xhr.send(formData);
 		});
 
@@ -273,7 +257,7 @@
 											stroke-linejoin="round"
 											stroke-width="2"
 											d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-										></path></svg
+										/></svg
 									>
 									<p class="mb-2 text-sm text-base-content/70">
 										<span class="font-semibold">Click to upload</span> or drag and drop
@@ -284,7 +268,7 @@
 							<!-- Background accent -->
 							<div
 								class="absolute inset-0 bg-primary/5 scale-0 group-hover:scale-100 rounded-2xl transition-transform duration-500 origin-center"
-							></div>
+							/>
 
 							<input
 								name="file"
@@ -358,7 +342,7 @@
 					</label>
 					<select name="language" bind:value={language} class="select select-bordered w-full">
 						{#each languages as l}
-							<option value={l}>{l === 'auto' ? 'Auto Detect' : l}</option>
+							<option value={l.value}>{l.label}</option>
 						{/each}
 					</select>
 				</div>
