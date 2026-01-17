@@ -252,9 +252,10 @@
 			bind:textContent={segment.text}
 			on:input={handleKeystrokes}
 			on:click|stopPropagation
-			class="w-full p-3 font-sans text-base leading-relaxed border border-transparent rounded-lg hover:border-base-content/10 focus:border-primary focus:bg-base-50 outline-none transition-all placeholder-opacity-50 min-h-[80px]"
+			class="w-full p-3 font-sans text-base leading-relaxed border border-transparent rounded-lg hover:border-base-content/10 focus:border-primary focus:bg-base-50 outline-none transition-all placeholder-opacity-50 min-h-[80px] {error
+				? 'bg-error/5'
+				: ''}"
 			class:border-error={error || getCps(segment) > 16}
-			class:bg-error/5={error}
 			class:bg-warning-content={isActive && false}
 			contenteditable="true"
 			placeholder="Transcription text..."

@@ -42,9 +42,9 @@
 
 			<!-- Desktop Nav Elements (Optional) -->
 			<div class="hidden md:flex items-center gap-8 text-sm font-medium text-white/60">
-				<a href="#features" class="hover:text-white transition-colors">Features</a>
-				<a href="#pricing" class="hover:text-white transition-colors">Pricing</a>
-				<a href="#testimonials" class="hover:text-white transition-colors">Reviews</a>
+				<a href="#features" class="hover:text-white transition-colors">Функции</a>
+				<a href="#pricing" class="hover:text-white transition-colors">Цены</a>
+				<a href="#testimonials" class="hover:text-white transition-colors">Отзывы</a>
 			</div>
 
 			<!-- CTA -->
@@ -52,7 +52,7 @@
 				<a
 					href="/auth/login"
 					class="text-sm font-medium text-white/70 hover:text-white transition-colors hidden md:block"
-					>Sign In</a
+					>Войти</a
 				>
 				<a
 					href="/auth/register"
@@ -77,9 +77,9 @@
 					</span>
 					<span
 						class="absolute flex items-center justify-center w-full h-full text-white transition-all duration-300 transform group-hover:translate-x-full ease"
-						>Get Started</span
+						>Начать</span
 					>
-					<span class="relative invisible">Get Started</span>
+					<span class="relative invisible">Начать</span>
 				</a>
 			</div>
 		</div>
@@ -99,26 +99,26 @@
 					/>
 					<span class="relative inline-flex rounded-full h-2 w-2 bg-primary" />
 				</span>
-				The Next Gen Transcription is Live
+				Транскрипция нового поколения уже здесь
 			</div>
 
 			<h1
 				class="text-5xl md:text-8xl font-bold tracking-tight mb-8 leading-[1.1] animate-fade-in-up delay-100"
 			>
-				Your Voice, <br />
+				Ваш Голос, <br />
 				<span
 					class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-primary to-fuchsia-400"
 				>
-					Perfectly Scripted.
+					Идеально Записанный.
 				</span>
 			</h1>
 
 			<p
 				class="text-lg md:text-xl text-white/50 max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-in-up delay-200"
 			>
-				Transform audio into flawless text with the world's most advanced AI models.
-				<span class="text-white/80">Whisper V3 Turbo</span> integration ensures 99.9% accuracy at lightning
-				speed.
+				Превращайте аудио в безупречный текст с помощью самых передовых моделей ИИ.
+				<span class="text-white/80">Whisper V3 Turbo</span> обеспечивает точность 99.9% с молниеносной
+				скоростью.
 			</p>
 
 			<div class="flex flex-col sm:flex-row items-center gap-4 animate-fade-in-up delay-300">
@@ -126,13 +126,13 @@
 					href="/auth/register"
 					class="btn btn-primary btn-lg rounded-full px-10 shadow-[0_0_30px_-5px_theme(colors.primary)] hover:shadow-[0_0_50px_-5px_theme(colors.primary)] border-none text-white transition-all hover:scale-105"
 				>
-					Start Transcribing Free
+					Начать Бесплатно
 				</a>
 				<a
 					href="/auth/login"
-					class="btn btn-ghost btn-lg rounded-full px-8 text-white/60 hover:text-white hover:bg-white/5 border border-white/5 hover:border-white/20"
+					class="btn btn-ghost btn-lg rounded-full px-8 text-white/60 hover:text-white hover:bg-white/5 border border-white/5 hover:border-white/20 flex items-center justify-center"
 				>
-					Login
+					Войти
 				</a>
 			</div>
 
@@ -170,9 +170,9 @@
 							<p
 								class="text-xl font-medium text-white group-hover:text-primary-content transition-colors"
 							>
-								Drop your file here or click to upload
+								Перетащите файл сюда или нажмите
 							</p>
-							<p class="text-sm text-white/40">Supported formats: MP3, WAV, M4A, MP4</p>
+							<p class="text-sm text-white/40">Поддерживаемые форматы: MP3, WAV, M4A, MP4</p>
 						</div>
 
 						<!-- Fake Progress/Status Pill -->
@@ -180,7 +180,7 @@
 							class="inline-flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/5 text-xs text-white/30 mt-4"
 						>
 							<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-							Ready to process
+							Готов к обработке
 						</div>
 					</div>
 				</a>
@@ -191,7 +191,7 @@
 		<section id="features" class="max-w-7xl mx-auto mb-32">
 			<div class="text-center mb-16">
 				<h2 class="text-3xl md:text-5xl font-bold mb-4">
-					Everything you need. <br /><span class="text-white/40">Nothing you don't.</span>
+					Всё, что вам нужно. <br /><span class="text-white/40">И ничего лишнего.</span>
 				</h2>
 			</div>
 
@@ -207,13 +207,13 @@
 							><path d="M13 10V3L4 14h7v7l9-11h-9z" /></svg
 						>
 					</div>
-					<h3 class="text-2xl font-bold mb-2">Lightning Fast</h3>
+					<h3 class="text-2xl font-bold mb-2">Молниеносно быстро</h3>
 					<p class="text-white/60 text-lg max-w-md">
-						Process hours of audio in minutes. Our optimized engine runs up to 10x faster than
-						real-time.
+						Обрабатывайте часы аудио за минуты. Наш оптимизированный движок работает до 10 раз
+						быстрее воспроизведения.
 					</p>
 					<div class="mt-8 flex items-end gap-2 text-4xl font-mono text-primary">
-						10x <span class="text-sm text-white/40 mb-2 font-sans">Faster</span>
+						10x <span class="text-sm text-white/40 mb-2 font-sans">Быстрее</span>
 					</div>
 				</div>
 
@@ -222,8 +222,8 @@
 					class="md:col-span-2 rounded-3xl p-8 bg-gradient-to-br from-white/5 to-white/0 border border-white/10 hover:border-primary/30 transition-colors flex flex-col justify-between"
 				>
 					<div>
-						<h3 class="text-2xl font-bold mb-2">Precision</h3>
-						<p class="text-white/60">Powered by Whisper V3.</p>
+						<h3 class="text-2xl font-bold mb-2">Точность</h3>
+						<p class="text-white/60">На базе Whisper V3.</p>
 					</div>
 					<div
 						class="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 self-end"
@@ -248,9 +248,9 @@
 							/></svg
 						>
 					</div>
-					<h3 class="text-xl font-bold mb-2">Private by Design</h3>
+					<h3 class="text-xl font-bold mb-2">Приватность</h3>
 					<p class="text-white/60 text-sm">
-						Your data is encrypted at rest and in transit. We don't train our models on your files.
+						Ваши данные зашифрованы. Мы не обучаем модели на ваших файлах.
 					</p>
 				</div>
 
@@ -272,7 +272,7 @@
 						<div
 							class="w-10 h-10 rounded-full border-2 border-[#050510] bg-white/10 flex items-center justify-center text-xs"
 						>
-							FR
+							RU
 						</div>
 						<div
 							class="w-10 h-10 rounded-full border-2 border-[#050510] bg-white/20 flex items-center justify-center text-xs"
@@ -280,17 +280,17 @@
 							+90
 						</div>
 					</div>
-					<h3 class="text-xl font-bold">Multilingual</h3>
-					<p class="text-white/60 text-sm mt-2">Auto-detection support for over 90 languages.</p>
+					<h3 class="text-xl font-bold">Мультиязычность</h3>
+					<p class="text-white/60 text-sm mt-2">Поддержка более 90 языков.</p>
 				</div>
 
 				<!-- Editor Card -->
 				<div
 					class="md:col-span-2 rounded-3xl p-8 bg-white/5 border border-white/10 hover:border-primary/30 transition-colors group"
 				>
-					<h3 class="text-xl font-bold mb-2">Smart Editor</h3>
+					<h3 class="text-xl font-bold mb-2">Умный Редактор</h3>
 					<p class="text-white/60 text-sm mb-4">
-						Edit transcripts with ease. Timestamps, speakers, and export options included.
+						Удобное редактирование, таймкоды, разделение спикеров и экспорт.
 					</p>
 					<div class="w-full h-2 rounded bg-white/10 overflow-hidden">
 						<div
@@ -305,11 +305,11 @@
 		<footer
 			class="max-w-7xl mx-auto pt-20 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6"
 		>
-			<div class="text-white/40 text-sm">© 2026 {$t('app_name')}. All rights reserved.</div>
+			<div class="text-white/40 text-sm">© 2026 {$t('app_name')}. Все права защищены.</div>
 			<div class="flex gap-6 text-sm text-white/40">
-				<a href="#" class="hover:text-white transition-colors">Privacy</a>
-				<a href="#" class="hover:text-white transition-colors">Terms</a>
-				<a href="#" class="hover:text-white transition-colors">Contact</a>
+				<a href="#" class="hover:text-white transition-colors">Конфиденциальность</a>
+				<a href="#" class="hover:text-white transition-colors">Условия</a>
+				<a href="#" class="hover:text-white transition-colors">Контакты</a>
 			</div>
 		</footer>
 	</main>
