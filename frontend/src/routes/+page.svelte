@@ -1,5 +1,17 @@
 <script>
 	import { theme, t } from '$lib/stores';
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { supabase } from '$lib/supabase';
+
+	onMount(async () => {
+		const {
+			data: { session }
+		} = await supabase.auth.getSession();
+		if (session) {
+			goto('/app');
+		}
+	});
 
 	// Animation constants or states could go here
 </script>
