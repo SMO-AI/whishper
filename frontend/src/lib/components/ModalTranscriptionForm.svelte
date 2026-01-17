@@ -87,9 +87,12 @@
 					fileName = '';
 					// Close the modal programmatically
 					document.getElementById('modalNewTranscription').close();
+				} else if (xhr.status === 403) {
+					reject('Forbidden');
+					toast.error($t('error_subscription_required'));
 				} else {
 					reject(xhr.statusText);
-					toast.error('Upload failed');
+					toast.error($t('upload_failed'));
 				}
 			});
 

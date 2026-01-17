@@ -88,6 +88,16 @@
 			goto('/auth/login');
 			return;
 		}
+
+		// Ensure user has the correct app metadata (e.g. for Google Login)
+		const appMeta = session.user.user_metadata?.app;
+		if (appMeta !== 'Scriptus' && appMeta !== 'whishper') {
+			console.log('Updating user metadata to Scriptus...');
+			await supabase.auth.updateUser({
+				data: { app: 'Scriptus' }
+			});
+		}
+
 		connect(session.access_token);
 	});
 

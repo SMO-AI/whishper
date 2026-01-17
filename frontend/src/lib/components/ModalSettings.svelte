@@ -101,10 +101,10 @@
 			if (error) throw error;
 
 			// 2. Update whishper_profiles Table
-			const { error: dbError } = await supabase
-				.from('whishper_profiles')
-				.update(dbUpdates)
-				.eq('id', session.user.id);
+			const { error: dbError } = await supabase.from('whishper_profiles').upsert({
+				id: session.user.id,
+				...dbUpdates
+			});
 
 			if (dbError) throw dbError;
 

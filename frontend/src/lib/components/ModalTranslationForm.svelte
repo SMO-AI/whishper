@@ -3,6 +3,7 @@
 	import toast from 'svelte-french-toast';
 	import { CLIENT_API_HOST } from '$lib/utils';
 	import { env } from '$env/dynamic/public';
+	import { supabase } from '$lib/supabase';
 	export let tr;
 
 	let targetLanguage = null;
@@ -28,15 +29,33 @@
 
 	import { t } from '$lib/stores';
 
-	const handleTranslate = (id) => {
+	const handleTranslate = async (id) => {
 		if (targetLanguage) {
+			const {
+				data: { session }
+			} = await supabase.auth.getSession();
+			const accessToken = session?.access_token;
+
 			const url = `${CLIENT_API_HOST}/api/translate/${id}/${targetLanguage}`;
-			fetch(url)
-				.then(() => toast.success($t('translation_started')))
-				.catch((error) => {
-					console.error(error);
-					toast.error($t('translation_error'));
+			try {
+				const response = await fetch(url, {
+					headers: {
+						Authorization: accessToken ? `Bearer ${accessToken}` : ''
+					}
 				});
+
+				if (response.ok) {
+					toast.success($t('translation_started'));
+					document.getElementById('modalTranslation').close();
+				} else if (response.status === 403) {
+					toast.error($t('error_subscription_required'));
+				} else {
+					toast.error($t('translation_error'));
+				}
+			} catch (error) {
+				console.error(error);
+				toast.error($t('translation_error'));
+			}
 		}
 	};
 
