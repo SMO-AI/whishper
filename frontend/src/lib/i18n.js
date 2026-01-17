@@ -125,7 +125,8 @@ const translations = {
 		quote_14: "Words, don't come easy, but I can help find the way.",
 		quote_15: "You speak, I write. It's no magic, just AI!",
 		quote_16: "Can't understand that language? I can translate!",
-		quote_17: 'I mean every word I say!'
+		quote_17: 'I mean every word I say!',
+		login: 'Login'
 	},
 	ru: {
 		settings: 'Настройки',
@@ -249,7 +250,8 @@ const translations = {
 		quote_14: 'Слова даются нелегко, но я помогу найти путь.',
 		quote_15: 'Вы говорите, я пишу. Это не магия, это ИИ!',
 		quote_16: 'Не понимаете язык? Я переведу!',
-		quote_17: 'Я отвечаю за каждое слово!'
+		quote_17: 'Я отвечаю за каждое слово!',
+		login: 'Войти'
 	}
 };
 

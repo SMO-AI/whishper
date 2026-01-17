@@ -28,7 +28,7 @@
 	>
 		<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
 			<!-- Logo -->
-			<div class="flex items-center gap-2 group cursor-pointer">
+			<a href="/" class="flex items-center gap-2 group cursor-pointer">
 				<img
 					src="/logo.svg"
 					alt="App Logo"
@@ -38,7 +38,7 @@
 					class="text-xl font-bold tracking-tight text-white group-hover:opacity-80 transition-opacity"
 					>{$t('app_name')}</span
 				>
-			</div>
+			</a>
 
 			<!-- Desktop Nav Elements (Optional) -->
 			<div class="hidden md:flex items-center gap-8 text-sm font-medium text-white/60">
@@ -132,7 +132,7 @@
 					href="/auth/login"
 					class="btn btn-ghost btn-lg rounded-full px-8 text-white/60 hover:text-white hover:bg-white/5 border border-white/5 hover:border-white/20"
 				>
-					Login
+					{$t('login')}
 				</a>
 			</div>
 

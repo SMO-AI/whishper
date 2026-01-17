@@ -19,8 +19,11 @@
 
 		if (!session) {
 			const path = window.location.pathname;
-			if (path !== '/' && !path.startsWith('/auth')) {
+			if (path !== '/' && path !== '/ru' && !path.startsWith('/auth')) {
 				goto('/auth/login');
+			}
+			if (path === '/ru') {
+				locale.set('ru');
 			}
 		} else {
 			// Check and update user metadata if needed (fixes Google Auth profile creation)
@@ -32,7 +35,11 @@
 				});
 			}
 
-			if (window.location.pathname === '/' || window.location.pathname.startsWith('/auth')) {
+			if (
+				window.location.pathname === '/' ||
+				window.location.pathname === '/ru' ||
+				window.location.pathname.startsWith('/auth')
+			) {
 				// Redirect logged-in users from public roots to app
 				goto('/app');
 			}
