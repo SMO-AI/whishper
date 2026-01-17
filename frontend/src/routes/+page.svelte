@@ -105,20 +105,21 @@
 			<h1
 				class="text-5xl md:text-8xl font-bold tracking-tight mb-8 leading-[1.1] animate-fade-in-up delay-100"
 			>
-				Your Voice, <br />
+				Audio into Text. <br />
 				<span
 					class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-primary to-fuchsia-400"
 				>
-					Perfectly Scripted.
+					Fast. Accurate. Done.
 				</span>
 			</h1>
 
 			<p
 				class="text-lg md:text-xl text-white/50 max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-in-up delay-200"
 			>
-				Transform audio into flawless text with the world's most advanced AI models.
-				<span class="text-white/80">Whisper V3 Turbo</span> integration ensures 99.9% accuracy at lightning
-				speed.
+				Stop typing manually. Convert your interviews, meetings, and content into perfect text in
+				seconds.
+				<span class="text-white/80">Whisper V3 Turbo</span> guarantees human-level accuracy for every
+				word.
 			</p>
 
 			<div class="flex flex-col sm:flex-row items-center gap-4 animate-fade-in-up delay-300">
@@ -191,7 +192,9 @@
 		<section id="features" class="max-w-7xl mx-auto mb-32">
 			<div class="text-center mb-16">
 				<h2 class="text-3xl md:text-5xl font-bold mb-4">
-					Everything you need. <br /><span class="text-white/40">Nothing you don't.</span>
+					Built for Speed & Precision. <br /><span class="text-white/40"
+						>No more manual transcription.</span
+					>
 				</h2>
 			</div>
 
@@ -297,6 +300,291 @@
 							class="w-2/3 h-full bg-primary/50 group-hover:w-full transition-all duration-1000"
 						/>
 					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Pricing Section -->
+		<section id="pricing" class="max-w-7xl mx-auto mb-32 relative">
+			<!-- Background Glow -->
+			<div
+				class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-lg bg-primary/20 blur-[120px] rounded-full pointer-events-none"
+			/>
+
+			<div class="text-center mb-16 relative z-10">
+				<h2 class="text-3xl md:text-5xl font-bold mb-4">Simple, Transparent Pricing.</h2>
+				<p class="text-xl text-white/50">Start for free, upgrade when you need more power.</p>
+			</div>
+
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
+				<!-- Free Plan -->
+				<div
+					class="rounded-3xl p-8 bg-white/5 border border-white/10 hover:border-white/20 transition-all flex flex-col"
+				>
+					<div class="mb-4">
+						<span class="px-3 py-1 rounded-full bg-white/10 text-xs font-medium text-white/80"
+							>Starter</span
+						>
+					</div>
+					<h3 class="text-4xl font-bold mb-2">$0</h3>
+					<p class="text-white/50 mb-8">Perfect for testing the waters.</p>
+
+					<ul class="space-y-4 mb-8 flex-1">
+						<li class="flex items-center gap-3 text-sm text-white/80">
+							<svg
+								class="w-5 h-5 text-emerald-400"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M5 13l4 4L19 7"
+								/></svg
+							>
+							15 minutes per month
+						</li>
+						<li class="flex items-center gap-3 text-sm text-white/80">
+							<svg
+								class="w-5 h-5 text-emerald-400"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M5 13l4 4L19 7"
+								/></svg
+							>
+							Standard Accuracy (Whisper V2)
+						</li>
+						<li class="flex items-center gap-3 text-sm text-white/80">
+							<svg
+								class="w-5 h-5 text-emerald-400"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M5 13l4 4L19 7"
+								/></svg
+							>
+							Single Speaker Detection
+						</li>
+						<li class="flex items-center gap-3 text-sm text-white/80">
+							<svg
+								class="w-5 h-5 text-emerald-400"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M5 13l4 4L19 7"
+								/></svg
+							>
+							MP3, WAV export
+						</li>
+					</ul>
+
+					<a
+						href="/auth/register"
+						class="btn btn-outline border-white/20 text-white hover:bg-white hover:text-black w-full rounded-2xl"
+						>Get Started</a
+					>
+				</div>
+
+				<!-- Pro Plan (Main) -->
+				<div
+					class="rounded-3xl p-8 bg-gradient-to-b from-primary/10 to-primary/5 border border-primary/50 relative flex flex-col transform md:-translate-y-4 shadow-2xl shadow-primary/10"
+				>
+					<div class="absolute top-0 right-0 p-4">
+						<div class="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+							DATA SAFE
+						</div>
+					</div>
+					<div class="mb-4">
+						<span class="px-3 py-1 rounded-full bg-primary/20 text-xs font-medium text-primary"
+							>Creator</span
+						>
+					</div>
+					<h3 class="text-4xl font-bold mb-2">
+						$15<span class="text-lg text-white/40 font-normal">/mo</span>
+					</h3>
+					<p class="text-white/50 mb-8">For constant content creation.</p>
+
+					<ul class="space-y-4 mb-8 flex-1">
+						<li class="flex items-center gap-3 text-sm text-white">
+							<svg
+								class="w-5 h-5 text-primary"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M5 13l4 4L19 7"
+								/></svg
+							>
+							<strong>10 Hours</strong> per month
+						</li>
+						<li class="flex items-center gap-3 text-sm text-white">
+							<svg
+								class="w-5 h-5 text-primary"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M5 13l4 4L19 7"
+								/></svg
+							>
+							<strong>Whisper V3 Turbo</strong> (Best)
+						</li>
+						<li class="flex items-center gap-3 text-sm text-white">
+							<svg
+								class="w-5 h-5 text-primary"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M5 13l4 4L19 7"
+								/></svg
+							>
+							Advanced Speaker Diarization
+						</li>
+						<li class="flex items-center gap-3 text-sm text-white">
+							<svg
+								class="w-5 h-5 text-primary"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M5 13l4 4L19 7"
+								/></svg
+							>
+							Unlimited Cloud Storage
+						</li>
+						<li class="flex items-center gap-3 text-sm text-white">
+							<svg
+								class="w-5 h-5 text-primary"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M5 13l4 4L19 7"
+								/></svg
+							>
+							SRT, VTT, PDF, TXT Export
+						</li>
+					</ul>
+
+					<a
+						href="/auth/register"
+						class="btn btn-primary w-full rounded-2xl shadow-lg shadow-primary/25"
+						>Start Free Trial</a
+					>
+				</div>
+
+				<!-- Business Plan -->
+				<div
+					class="rounded-3xl p-8 bg-white/5 border border-white/10 hover:border-white/20 transition-all flex flex-col"
+				>
+					<div class="mb-4">
+						<span class="px-3 py-1 rounded-full bg-white/10 text-xs font-medium text-white/80"
+							>Business</span
+						>
+					</div>
+					<h3 class="text-4xl font-bold mb-2">
+						$49<span class="text-lg text-white/40 font-normal">/mo</span>
+					</h3>
+					<p class="text-white/50 mb-8">Maximum power for teams.</p>
+
+					<ul class="space-y-4 mb-8 flex-1">
+						<li class="flex items-center gap-3 text-sm text-white/80">
+							<svg
+								class="w-5 h-5 text-emerald-400"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M5 13l4 4L19 7"
+								/></svg
+							>
+							<strong>50 Hours</strong> per month
+						</li>
+						<li class="flex items-center gap-3 text-sm text-white/80">
+							<svg
+								class="w-5 h-5 text-emerald-400"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M5 13l4 4L19 7"
+								/></svg
+							>
+							Priority Processing Queue
+						</li>
+						<li class="flex items-center gap-3 text-sm text-white/80">
+							<svg
+								class="w-5 h-5 text-emerald-400"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M5 13l4 4L19 7"
+								/></svg
+							>
+							API Access
+						</li>
+						<li class="flex items-center gap-3 text-sm text-white/80">
+							<svg
+								class="w-5 h-5 text-emerald-400"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M5 13l4 4L19 7"
+								/></svg
+							>
+							Team Management
+						</li>
+					</ul>
+
+					<a
+						href="/auth/register"
+						class="btn btn-outline border-white/20 text-white hover:bg-white hover:text-black w-full rounded-2xl"
+						>Contact Sales</a
+					>
 				</div>
 			</div>
 		</section>
