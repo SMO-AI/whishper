@@ -4,6 +4,56 @@
 	// Animation constants or states could go here
 </script>
 
+<svelte:head>
+	<title>Скриптус - Транскрибация аудио в текст с помощью ИИ | Быстро и точно</title>
+	<meta
+		name="description"
+		content="Профессиональная транскрибация аудио и видео с помощью ИИ. Превращайте интервью, встречи и лекции в текст за считанные секунды с точностью Whisper V3 Turbo."
+	/>
+	<meta
+		name="keywords"
+		content="транскрибация, ИИ, аудио в текст, видео в текст, Whisper V3, распознавание речи, Скриптус"
+	/>
+
+	<!-- Open Graph / Facebook -->
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://scriptus.online/ru" />
+	<meta property="og:title" content="Скриптус - ИИ Транскрибация Аудио в Текст" />
+	<meta
+		property="og:description"
+		content="Быстрая, точная и безопасная транскрибация. Конвертируйте ваши медиафайлы в текст за минуты."
+	/>
+	<meta property="og:image" content="https://scriptus.online/og-image.png" />
+
+	<!-- Twitter -->
+	<meta property="twitter:card" content="summary_large_image" />
+	<meta property="twitter:url" content="https://scriptus.online/ru" />
+	<meta property="twitter:title" content="Скриптус - ИИ Транскрибация Аудио в Текст" />
+	<meta
+		property="twitter:description"
+		content="Быстрая, точная и безопасная транскрибация. Конвертируйте ваши медиафайлы в текст за минуты."
+	/>
+	<meta property="twitter:image" content="https://scriptus.online/og-image.png" />
+
+	<link rel="canonical" href="https://scriptus.online/ru" />
+
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "SoftwareApplication",
+			"name": "Скриптус",
+			"operatingSystem": "Web",
+			"applicationCategory": "MultimediaApplication",
+			"offers": {
+				"@type": "Offer",
+				"price": "0.00",
+				"priceCurrency": "USD"
+			},
+			"description": "Профессиональная транскрибация аудио и видео с помощью ИИ. Превращайте интервью, встречи и лекции в текст за считанные секунды."
+		}
+	</script>
+</svelte:head>
+
 <div
 	class="min-h-screen bg-[#050510] text-[#E0E0E0] overflow-x-hidden relative font-sans selection:bg-primary selection:text-white"
 >
@@ -31,7 +81,7 @@
 			<a href="/ru" class="flex items-center gap-2 group cursor-pointer">
 				<img
 					src="/logo.svg"
-					alt="App Logo"
+					alt="Логотип Скриптус"
 					class="w-10 h-10 transition-transform group-hover:scale-110"
 				/>
 				<span

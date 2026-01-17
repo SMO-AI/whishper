@@ -1,0 +1,21 @@
+{
+    "name": "Scriptus - AI Transcription",
+    "short_name": "Scriptus",
+    "description": "Professional AI audio to text transcription.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#050510",
+    "theme_color": "#6366f1",
+    "icons": [
+        {
+            "src": "/favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        },
+        {
+            "src": "/logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

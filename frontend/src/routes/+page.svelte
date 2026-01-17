@@ -16,6 +16,56 @@
 	// Animation constants or states could go here
 </script>
 
+<svelte:head>
+	<title>Scriptus - AI Audio to Text Transcription | Fast & Accurate</title>
+	<meta
+		name="description"
+		content="Professional AI transcription for audio and video. Convert interviews, meetings, and content into perfect text in seconds with Whisper V3 Turbo accuracy."
+	/>
+	<meta
+		name="keywords"
+		content="transcription, AI, audio to text, video to text, Whisper V3, speech recognition, Scriptus"
+	/>
+
+	<!-- Open Graph / Facebook -->
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://scriptus.online/" />
+	<meta property="og:title" content="Scriptus - AI Audio to Text Transcription" />
+	<meta
+		property="og:description"
+		content="Fast, accurate, and secure AI transcription. Convert your media to text in minutes."
+	/>
+	<meta property="og:image" content="https://scriptus.online/og-image.png" />
+
+	<!-- Twitter -->
+	<meta property="twitter:card" content="summary_large_image" />
+	<meta property="twitter:url" content="https://scriptus.online/" />
+	<meta property="twitter:title" content="Scriptus - AI Audio to Text Transcription" />
+	<meta
+		property="twitter:description"
+		content="Fast, accurate, and secure AI transcription. Convert your media to text in minutes."
+	/>
+	<meta property="twitter:image" content="https://scriptus.online/og-image.png" />
+
+	<link rel="canonical" href="https://scriptus.online/" />
+
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "SoftwareApplication",
+			"name": "Scriptus",
+			"operatingSystem": "Web",
+			"applicationCategory": "MultimediaApplication",
+			"offers": {
+				"@type": "Offer",
+				"price": "0.00",
+				"priceCurrency": "USD"
+			},
+			"description": "Professional AI transcription for audio and video. Convert interviews, meetings, and content into perfect text in seconds."
+		}
+	</script>
+</svelte:head>
+
 <div
 	class="min-h-screen bg-[#050510] text-[#E0E0E0] overflow-x-hidden relative font-sans selection:bg-primary selection:text-white"
 >
@@ -43,7 +93,7 @@
 			<a href="/" class="flex items-center gap-2 group cursor-pointer">
 				<img
 					src="/logo.svg"
-					alt="App Logo"
+					alt="Scriptus Logo"
 					class="w-10 h-10 transition-transform group-hover:scale-110"
 				/>
 				<span

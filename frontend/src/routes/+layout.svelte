@@ -72,6 +72,7 @@
 		locale.subscribe((value) => {
 			if (typeof document !== 'undefined') {
 				localStorage.setItem('locale', value);
+				document.documentElement.lang = value;
 			}
 		});
 	});
