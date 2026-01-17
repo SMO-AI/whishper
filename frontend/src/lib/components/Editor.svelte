@@ -29,7 +29,7 @@
 					: $currentTranscription.translations.find((t) => t.targetLanguage == $language).result
 							.segments;
 
-			const res = await fetch('/api/ai/check', {
+			const res = await fetch('/ai/check', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ segments })
@@ -258,7 +258,7 @@
 				<div class="flex items-center justify-between gap-4">
 					<div class="flex-1 min-w-0 flex items-center gap-3">
 						<a
-							href="/"
+							href="/app"
 							class="btn btn-ghost btn-sm btn-circle opacity-60 hover:opacity-100 transition-opacity"
 							title="Back to Home"
 						>
