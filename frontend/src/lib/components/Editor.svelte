@@ -10,6 +10,85 @@
 
 	let language = writable('original');
 
+	// AI Error Checking
+	let checkingErrors = false;
+	let errors = {}; // Map: segmentId -> correctedText
+
+	async function checkErrors() {
+		if (checkingErrors) return;
+		checkingErrors = true;
+		errors = {};
+
+		const loadingId = toast.loading('AI is checking for errors...');
+
+		try {
+			// Select segments based on current language
+			const segments =
+				$language == 'original'
+					? $currentTranscription.result.segments
+					: $currentTranscription.translations.find((t) => t.targetLanguage == $language).result
+							.segments;
+
+			const res = await fetch('/api/ai/check', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ segments })
+			});
+
+			const data = await res.json();
+
+			if (data.error) throw new Error(data.error);
+
+			errors = data.corrections || {};
+
+			if (Object.keys(errors).length === 0) {
+				toast.success('No errors found!', { id: loadingId });
+			} else {
+				toast.error(`Found ${Object.keys(errors).length} segments with errors.`, { id: loadingId });
+			}
+		} catch (e) {
+			console.error(e);
+			toast.error('Failed to check errors: ' + e.message, { id: loadingId });
+		} finally {
+			checkingErrors = false;
+		}
+	}
+
+	function fixError(id) {
+		const newErrors = { ...errors };
+		delete newErrors[id];
+		errors = newErrors;
+	}
+
+	function fixAllErrors() {
+		// Apply all fixes
+		const source =
+			$language == 'original'
+				? $currentTranscription.result.segments
+				: $currentTranscription.translations.find((t) => t.targetLanguage == $language).result
+						.segments;
+
+		let updated = false;
+		source.forEach((seg) => {
+			if (errors[seg.id]) {
+				seg.text = errors[seg.id];
+				updated = true;
+			}
+		});
+
+		if (updated) {
+			$currentTranscription = { ...$currentTranscription };
+			errors = {};
+			toast.success('All errors fixed!');
+
+			// Update history
+			let currentT = JSON.parse(JSON.stringify($currentTranscription));
+			editorHistory.update((value) => {
+				return [...value, currentT];
+			});
+		}
+	}
+
 	// Segments lazy loading
 	let segmentsToShow = 20;
 	function loadMore() {
@@ -238,6 +317,52 @@
 				<div class="flex flex-wrap items-center justify-between gap-4 pt-1 pl-12 pr-1">
 					<EditorSettings />
 
+					<!-- AI Actions -->
+					<div class="flex items-center gap-2">
+						{#if Object.keys(errors).length > 0}
+							<button
+								on:click={fixAllErrors}
+								class="btn btn-xs btn-success gap-1 text-white shadow-sm hover:shadow-md transition-all"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="w-3 h-3"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg
+								>
+								Fix All Errors ({Object.keys(errors).length})
+							</button>
+						{/if}
+						<button
+							on:click={checkErrors}
+							class="btn btn-xs btn-ghost gap-1 border border-base-content/20 hover:border-primary hover:text-primary transition-all ml-2"
+							disabled={checkingErrors}
+						>
+							{#if checkingErrors}
+								<span class="loading loading-spinner loading-xs" />
+							{:else}
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="w-3 h-3"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									><path
+										d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 0 1 9-9"
+									/></svg
+								>
+							{/if}
+							AI Check
+						</button>
+					</div>
+
 					{#if $currentTranscription.translations.length > 0}
 						<select
 							bind:value={$language}
@@ -272,13 +397,25 @@
 					<tbody class="text-sm">
 						{#if $language == 'original'}
 							{#each $currentTranscription.result.segments.slice(0, segmentsToShow) as segment, index (segment.id)}
-								<EditorSegment {segment} {index} translationIndex={-1} />
+								<EditorSegment
+									{segment}
+									{index}
+									translationIndex={-1}
+									error={errors[segment.id]}
+									on:fix={() => fixError(segment.id)}
+								/>
 							{/each}
 						{:else}
 							{#each $currentTranscription.translations as translation, translationIndex}
 								{#if translation.targetLanguage == $language}
 									{#each translation.result.segments.slice(0, segmentsToShow) as segment, index (segment.id)}
-										<EditorSegment {segment} {index} {translationIndex} />
+										<EditorSegment
+											{segment}
+											{index}
+											{translationIndex}
+											error={errors[segment.id]}
+											on:fix={() => fixError(segment.id)}
+										/>
 									{/each}
 								{/if}
 							{/each}

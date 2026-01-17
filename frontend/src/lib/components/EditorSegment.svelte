@@ -4,6 +4,10 @@
 	export let index;
 	export let segment;
 	export let translationIndex;
+	export let error = null;
+
+	import { createEventDispatcher } from 'svelte';
+	const dispatch = createEventDispatcher();
 
 	let isActive = false;
 
@@ -118,6 +122,14 @@
 		});
 		$currentTranscription = { ...$currentTranscription }; // deep copy
 		callback();
+	}
+
+	function applyFix() {
+		if (error) {
+			segment.text = error;
+			handleHistory();
+			dispatch('fix', { id: segment.id });
+		}
 	}
 
 	$: if (segment.start <= $currentVideoPlayerTime && $currentVideoPlayerTime <= segment.end) {
@@ -241,7 +253,8 @@
 			on:input={handleKeystrokes}
 			on:click|stopPropagation
 			class="w-full p-3 font-sans text-base leading-relaxed border border-transparent rounded-lg hover:border-base-content/10 focus:border-primary focus:bg-base-50 outline-none transition-all placeholder-opacity-50 min-h-[80px]"
-			class:border-error={getCps(segment) > 16}
+			class:border-error={error || getCps(segment) > 16}
+			class:bg-error/5={error}
 			class:bg-warning-content={isActive && false}
 			contenteditable="true"
 			placeholder="Transcription text..."
@@ -333,6 +346,25 @@
 					/></svg
 				>
 			</button>
+
+			{#if error}
+				<button
+					on:click|stopPropagation={applyFix}
+					class="btn btn-error btn-xs btn-square text-white hover:bg-error/80 transition-colors tooltip tooltip-left animate-pulse"
+					data-tip="Fix Error"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="w-4 h-4"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg
+					>
+				</button>
+			{/if}
 
 			<!-- Insert Below -->
 			<button
