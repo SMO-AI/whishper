@@ -38,7 +38,7 @@
 <Toaster />
 
 {#if $currentTranscription}
-	<div class="flex flex-col h-[100dvh] bg-base-100 overflow-hidden lg:flex-row">
+	<div class="flex flex-col h-[100dvh] bg-base-100 overflow-hidden {isAudio ? '' : 'lg:flex-row'}">
 		<!-- Media Player Section -->
 		<div
 			class="relative z-20 shrink-0 shadow-xl transition-all duration-500 ease-spring
@@ -127,7 +127,7 @@
 		</div>
 
 		<!-- Editor Section -->
-		<div class="flex-1 h-full overflow-hidden bg-base-100 relative z-10 flex flex-col">
+		<div class="flex-1 overflow-hidden bg-base-100 relative z-10 flex flex-col">
 			<Editor />
 		</div>
 	</div>
