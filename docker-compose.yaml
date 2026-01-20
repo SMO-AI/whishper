@@ -38,6 +38,14 @@ services:
     restart: unless-stopped
     ports:
       - "8082:80"
+    labels:
+      - "coolify.managed=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.whishper-scriptus.rule=Host(`scriptus.online`)"
+      - "traefik.http.routers.whishper-scriptus.entrypoints=websecure"
+      - "traefik.http.routers.whishper-scriptus.tls=true"
+      - "traefik.http.routers.whishper-scriptus.tls.certresolver=letsencrypt"
+      - "traefik.http.services.whishper-scriptus.loadbalancer.server.port=80"
 
     volumes:
       - uploads:/app/uploads

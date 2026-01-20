@@ -67,4 +67,4 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/do
 COPY ./supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 ENTRYPOINT ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
-EXPOSE 8080 3000 5000 80
+EXPOSE 80
