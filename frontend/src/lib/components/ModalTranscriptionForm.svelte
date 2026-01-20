@@ -137,9 +137,55 @@
 			disableSubmit = true;
 		}
 	};
+
+	let isDragging = false;
+
+	function handleDragOver(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		isDragging = true;
+	}
+
+	function handleDragLeave(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		isDragging = false;
+	}
+
+	export function handleFiles(files) {
+		if (files && files.length > 0) {
+			activeTab = 'file';
+			sourceUrl = '';
+			fileInput.files = files;
+			handleFileChange({ target: fileInput });
+			document.getElementById('modalNewTranscription').showModal();
+			sendForm(); // Automatically start transcription on drop
+		}
+	}
+
+	function handleDrop(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		isDragging = false;
+
+		if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+			handleFiles(e.dataTransfer.files);
+		}
+	}
 </script>
 
-<dialog id="modalNewTranscription" class="modal">
+<dialog
+	id="modalNewTranscription"
+	class="modal"
+	on:dragover={(e) => {
+		e.preventDefault();
+		e.stopPropagation();
+	}}
+	on:drop={(e) => {
+		e.preventDefault();
+		e.stopPropagation();
+	}}
+>
 	<form
 		method="dialog"
 		class="modal-box w-11/12 max-w-2xl bg-base-100 p-0 overflow-hidden rounded-3xl shadow-2xl"
@@ -220,7 +266,12 @@
 				{#if activeTab === 'file'}
 					<div class="w-full">
 						<label
-							class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-2xl cursor-pointer bg-base-200/30 border-base-content/20 hover:bg-base-200 hover:border-primary/50 transition-all group relative overflow-hidden"
+							class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-2xl cursor-pointer bg-base-200/30 border-base-content/20 hover:bg-base-200 hover:border-primary/50 transition-all group relative overflow-hidden {isDragging
+								? 'border-primary bg-primary/5 ring-4 ring-primary/10'
+								: ''}"
+							on:dragover={handleDragOver}
+							on:dragleave={handleDragLeave}
+							on:drop={handleDrop}
 						>
 							<div class="flex flex-col items-center justify-center pt-5 pb-6 z-10">
 								{#if fileName}

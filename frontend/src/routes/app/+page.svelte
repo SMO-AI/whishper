@@ -153,12 +153,35 @@
 			cloudAnimation = '';
 		}, 1000);
 	}
+
+	let modalTranscriptionForm;
+	let isDraggingGlobal = false;
+
+	function handleDragOverGlobal(e) {
+		e.preventDefault();
+		isDraggingGlobal = true;
+	}
+
+	function handleDragLeaveGlobal(e) {
+		e.preventDefault();
+		if (!e.currentTarget.contains(e.relatedTarget)) {
+			isDraggingGlobal = false;
+		}
+	}
+
+	function handleDropGlobal(e) {
+		e.preventDefault();
+		isDraggingGlobal = false;
+		if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+			modalTranscriptionForm.handleFiles(e.dataTransfer.files);
+		}
+	}
 </script>
 
 <Toaster />
 <ModalDownloadOptions tr={downloadTranscription} />
 <ModalTranslationForm tr={translateTranscription} />
-<ModalTranscriptionForm />
+<ModalTranscriptionForm bind:this={modalTranscriptionForm} />
 <ModalSubscription bind:this={modalSubscription} />
 <ModalSettings bind:this={modalSettings} />
 
@@ -313,7 +336,14 @@
 
 <main class="w-full max-w-5xl mx-auto px-4 mb-24">
 	<div
-		class="bg-base-200/50 backdrop-blur-sm rounded-3xl border border-base-300 p-6 md:p-8 shadow-2xl"
+		role="region"
+		aria-label="Transcription Library and Drop Zone"
+		class="bg-base-200/50 backdrop-blur-sm rounded-3xl border-2 border-dashed p-6 md:p-8 shadow-2xl transition-all duration-300 {isDraggingGlobal
+			? 'border-primary bg-primary/5 ring-8 ring-primary/5'
+			: 'border-base-300'}"
+		on:dragover={handleDragOverGlobal}
+		on:dragleave={handleDragLeaveGlobal}
+		on:drop={handleDropGlobal}
 	>
 		<div
 			class="flex flex-col md:flex-row items-center justify-between gap-6 mb-8 pb-8 border-b border-base-content/10"
