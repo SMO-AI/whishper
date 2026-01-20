@@ -45,6 +45,7 @@ services:
       - "traefik.http.routers.whishper.entrypoints=web,websecure"
       - "traefik.http.routers.whishper.tls=true"
       - "traefik.http.routers.whishper.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.whishper.priority=5000"
       - "traefik.http.services.whishper.loadbalancer.server.port=80"
 
     volumes:
