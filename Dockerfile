@@ -31,7 +31,7 @@ FROM python:3.11-slim as base
 RUN apt-get update && apt-get install -y curl \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y --no-install-recommends \
-    ffmpeg nodejs nginx supervisor build-essential python3-dev python3-pip libsndfile1 \
+    ffmpeg mpack nodejs nginx supervisor build-essential python3-dev python3-pip libsndfile1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install yt-dlp

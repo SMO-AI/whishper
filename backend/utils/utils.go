@@ -10,8 +10,11 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
+	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/rs/zerolog/log"
@@ -107,5 +110,97 @@ func SendTranscriptionRequest(t *models.Transcription, body *bytes.Buffer, write
 	}
 
 	return asrResponse, nil
+}
 
+func GetDuration(filePath string) (float64, error) {
+	// ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 input.mp4
+	cmd := exec.Command("ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", filePath)
+	out, err := cmd.Output()
+	if err != nil {
+		return 0, err
+	}
+	durationStr := strings.TrimSpace(string(out))
+	return strconv.ParseFloat(durationStr, 64)
+}
+
+func SplitFile(filePath string, segmentTime int) ([]string, error) {
+	// ffmpeg -i input.mp3 -f segment -segment_time 600 -vn -acodec libmp3lame -ar 16000 -ac 1 output_%03d.mp3
+	dir := filepath.Dir(filePath)
+	baseName := filepath.Base(filePath)
+	ext := ".mp3" // Standardize output to mp3
+	nameWithoutExt := strings.TrimSuffix(baseName, filepath.Ext(baseName))
+
+	// Pattern for output files
+	outputPattern := filepath.Join(dir, fmt.Sprintf("%s_part_%%03d%s", nameWithoutExt, ext))
+
+	// Transcoding to mono 16kHz mp3 ensures small chunks (around 5MB for 10min)
+	// and broad compatibility with ASR services like Groq and Faster-Whisper.
+	cmd := exec.Command("ffmpeg", "-i", filePath, "-f", "segment", "-segment_time", fmt.Sprintf("%d", segmentTime), "-vn", "-acodec", "libmp3lame", "-ar", "16000", "-ac", "1", outputPattern)
+
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
+	log.Info().Msgf("Splitting file %s into %d-second segments", filePath, segmentTime)
+	if err := cmd.Run(); err != nil {
+		log.Error().Msgf("FFmpeg error: %s", stderr.String())
+		return nil, fmt.Errorf("ffmpeg error: %v", err)
+	}
+
+	// Find generated files
+	matches, err := filepath.Glob(filepath.Join(dir, fmt.Sprintf("%s_part_*%s", nameWithoutExt, ext)))
+	if err != nil {
+		return nil, err
+	}
+
+	// Sort matches to ensure temporal order
+	sort.Strings(matches)
+
+	return matches, nil
+}
+
+func MergeTranscriptions(results []*models.WhisperResult, segmentTime float64) *models.WhisperResult {
+	finalResult := &models.WhisperResult{
+		Segments: []models.Segment{},
+	}
+
+	var totalDuration float64
+	var fullText strings.Builder
+
+	for i, res := range results {
+		offset := float64(i) * segmentTime
+
+		// Append text
+		if i > 0 {
+			fullText.WriteString(" ")
+		}
+		fullText.WriteString(res.Text)
+
+		// Adjust and append segments
+		for _, seg := range res.Segments {
+			seg.Start += offset
+			seg.End += offset
+
+			// Adjust word timestamps if available
+			for j := range seg.Words {
+				seg.Words[j].Start += offset
+				seg.Words[j].End += offset
+			}
+
+			finalResult.Segments = append(finalResult.Segments, seg)
+		}
+
+		// Duration might be slightly different than segmentTime for the last chunk
+		// providing a more accurate total duration would be sum of all durations
+		totalDuration += res.Duration
+
+		// Use the language detected in the first chunk as the overall language
+		if i == 0 {
+			finalResult.Language = res.Language
+		}
+	}
+
+	finalResult.Text = fullText.String()
+	finalResult.Duration = totalDuration
+
+	return finalResult
 }

@@ -10,6 +10,7 @@ from typing import Annotated, Optional
 from backends.fasterwhisper import FasterWhisperBackend
 from supabase import create_client, Client
 from pydantic import BaseModel
+import asyncio
 import boto3
 from botocore.exceptions import NoCredentialsError
 
@@ -76,11 +77,8 @@ async def transcribe_endpoint(
     
     print(f"Transcribing with model {model_size.value} on device {device} and task {task} for user {user_id}...")
     
-    result = None
-    saved_filename = filename
-    
-    # Save UploadFile to disk temporarily to upload to S3 later
     if file is not None:
+        # Save UploadFile to disk temporarily to upload to S3 later
         # Use a generic prefix if user is missing
         prefix = user_id
         saved_filename = f"{prefix}_{int(time.time())}_{file.filename}"

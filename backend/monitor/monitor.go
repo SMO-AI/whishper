@@ -2,10 +2,12 @@ package monitor
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/rs/zerolog/log"
 
@@ -65,6 +67,24 @@ func transcribe(s *api.Server, t *models.Transcription) error {
 		s.BroadcastTranscription(t)
 	}
 
+	// Check file size/duration
+	uploadDir := os.Getenv("UPLOAD_DIR")
+	filePath := filepath.Join(uploadDir, t.FileName)
+	fileInfo, err := os.Stat(filePath)
+	if err != nil {
+		log.Error().Err(err).Msg("Error stating file")
+		return err
+	}
+
+	// Threshold: 19MB (to be safe under 20MB limit if any)
+	// OR duration > 10m? Let's stick to size for now as that's the reported issue.
+	const maxFileSize = 19 * 1024 * 1024 // 19MB
+
+	if fileInfo.Size() > maxFileSize {
+		log.Info().Msgf("File %s is larger than %d bytes, processing in chunks", t.FileName, maxFileSize)
+		return processLargeTranscription(s, t)
+	}
+
 	// Prepare multipart form data
 	body, writer, err := prepareMultipartFormData(t)
 	if err != nil {
@@ -88,6 +108,107 @@ func transcribe(s *api.Server, t *models.Transcription) error {
 		return err
 	}
 	s.BroadcastTranscription(t)
+	return nil
+}
+
+func processLargeTranscription(s *api.Server, t *models.Transcription) error {
+	uploadDir := os.Getenv("UPLOAD_DIR")
+	filePath := filepath.Join(uploadDir, t.FileName)
+
+	// Split file into 10-minute segments
+	segmentTime := 600
+	chunks, err := utils.SplitFile(filePath, segmentTime)
+	if err != nil {
+		log.Error().Err(err).Msg("Error splitting file")
+		return err
+	}
+	defer func() {
+		for _, chunk := range chunks {
+			if err := os.Remove(chunk); err != nil {
+				log.Warn().Err(err).Msgf("Failed to cleanup chunk: %s", chunk)
+			}
+		}
+	}()
+
+	results := make([]*models.WhisperResult, len(chunks))
+	errs := make([]error, len(chunks))
+
+	var wg sync.WaitGroup
+	// Concurrency level (tuned for typical resource constraints)
+	concurrencyLimit := 3
+	semaphore := make(chan struct{}, concurrencyLimit)
+
+	log.Info().Msgf("Starting parallel processing of %d chunks with concurrency %d", len(chunks), concurrencyLimit)
+
+	for i, chunkPath := range chunks {
+		wg.Add(1)
+		go func(idx int, path string) {
+			defer wg.Done()
+			semaphore <- struct{}{}
+			defer func() { <-semaphore }()
+
+			log.Debug().Msgf("Transcribing chunk %d/%d: %s", idx+1, len(chunks), path)
+
+			chunkFileName := filepath.Base(path)
+			chunkTrans := &models.Transcription{
+				ModelSize: t.ModelSize,
+				Language:  t.Language,
+				Device:    t.Device,
+				Task:      t.Task,
+				FileName:  chunkFileName,
+			}
+
+			body, writer, err := prepareMultipartFormData(chunkTrans)
+			if err != nil {
+				errs[idx] = fmt.Errorf("chunk %d: form prep error: %v", idx, err)
+				return
+			}
+
+			res, err := utils.SendTranscriptionRequest(chunkTrans, body, writer)
+			if err != nil {
+				log.Error().Err(err).Msgf("Failed to process chunk %d", idx)
+				errs[idx] = fmt.Errorf("chunk %d: API error: %v", idx, err)
+				return
+			}
+
+			results[idx] = res
+		}(i, chunkPath)
+	}
+
+	wg.Wait()
+
+	// Aggregate errors
+	var combinedErr error
+	for _, e := range errs {
+		if e != nil {
+			if combinedErr == nil {
+				combinedErr = e
+			} else {
+				combinedErr = fmt.Errorf("%v; %v", combinedErr, e)
+			}
+		}
+	}
+
+	if combinedErr != nil {
+		return combinedErr
+	}
+
+	// Merge all transcription segments
+	log.Info().Msg("Merging chunk results...")
+	finalRes := utils.MergeTranscriptions(results, float64(segmentTime))
+
+	t.Result = *finalRes
+	t.Translations = []models.Translation{}
+	t.Status = models.TranscriptionStatusDone
+	_, err = s.Db.UpdateTranscription(t)
+	if err != nil {
+		log.Error().Err(err).Msg("Error finalizing transcription in DB")
+		return err
+	}
+
+	s.BroadcastTranscription(t)
+	log.Info().Msgf("Successfully processed large transcription: %s", t.FileName)
+
 	return nil
 }
 
