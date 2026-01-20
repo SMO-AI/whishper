@@ -39,14 +39,15 @@ services:
       - "coolify.managed=true"
       - "traefik.enable=true"
       - "traefik.http.routers.scriptus-main-router.rule=Host(`scriptus.online`) || Host(`www.scriptus.online`)"
-      - "traefik.http.routers.scriptus-main-router.entrypoints=web,websecure"
-      - "traefik.http.routers.scriptus-main-router.tls=true"
       - "traefik.http.routers.scriptus-main-router.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.scriptus-main-router.priority=20000"
+      - "traefik.http.routers.scriptus-main-router.priority=30000"
       - "traefik.http.routers.scriptus-main-router.service=scriptus-main-service"
       - "traefik.http.services.scriptus-main-service.loadbalancer.server.port=80"
     expose:
       - 80
+    networks:
+      - public
+      - default
 
     volumes:
       - uploads:/app/uploads
@@ -91,3 +92,8 @@ volumes:
   uploads:
   models:
   whishper_logs:
+
+
+networks:
+  public:
+    external: true
