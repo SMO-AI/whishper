@@ -41,11 +41,11 @@ services:
     labels:
       - "coolify.managed=true"
       - "traefik.enable=true"
-      - "traefik.http.routers.whishper-scriptus.rule=Host(`scriptus.online`)"
-      - "traefik.http.routers.whishper-scriptus.entrypoints=websecure"
-      - "traefik.http.routers.whishper-scriptus.tls=true"
-      - "traefik.http.routers.whishper-scriptus.tls.certresolver=letsencrypt"
-      - "traefik.http.services.whishper-scriptus.loadbalancer.server.port=80"
+      - "traefik.http.routers.whishper.rule=Host(`scriptus.online`) || Host(`www.scriptus.online`)"
+      - "traefik.http.routers.whishper.entrypoints=web,websecure"
+      - "traefik.http.routers.whishper.tls=true"
+      - "traefik.http.routers.whishper.tls.certresolver=letsencrypt"
+      - "traefik.http.services.whishper.loadbalancer.server.port=80"
 
     volumes:
       - uploads:/app/uploads
