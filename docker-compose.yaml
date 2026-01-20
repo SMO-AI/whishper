@@ -34,11 +34,23 @@ services:
   scriptus-app:
     build: .
     restart: unless-stopped
-    # No direct ports to avoid conflict with Traefik
+    expose:
+      - 80
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost/health-check" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     labels:
       - "coolify.managed=true"
       - "traefik.enable=true"
       - "traefik.http.routers.scriptus-main.rule=Host(`scriptus.online`) || Host(`www.scriptus.online`)"
+      - "traefik.http.routers.scriptus-main.entrypoints=web,websecure"
+      - "traefik.http.routers.scriptus-main.tls=true"
+      - "traefik.http.routers.scriptus-main.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.scriptus-main.priority=10000"
+      - "traefik.http.routers.scriptus-main.service=scriptus-main"
       - "traefik.http.services.scriptus-main.loadbalancer.server.port=80"
 
     volumes:
