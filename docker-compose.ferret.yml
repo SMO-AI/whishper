@@ -6,8 +6,8 @@ services:
     env_file:
       - .env
     environment:
-      - POSTGRES_USER=${DB_USER:-whishper}
-      - POSTGRES_PASSWORD=${DB_PASS:-whishper}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
       - POSTGRES_DB=whishper
     volumes:
       - ./whishper_data/db_data/ferret:/var/lib/postgresql/data
@@ -20,8 +20,8 @@ services:
     env_file:
       - .env
     environment:
-      - FERRETDB_POSTGRESQL_URL=postgres://${DB_USER:-whishper}:${DB_PASS:-whishper}@postgres:5432/whishper
-    command: ["--telemetry=disable"]
+      - FERRETDB_POSTGRESQL_URL=postgres://${DB_USER}:${DB_PASS}@postgres:5432/whishper
+    command: [ "--telemetry=disable" ]
 
   whishper:
     environment:

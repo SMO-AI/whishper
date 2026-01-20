@@ -10,11 +10,11 @@ services:
       - ./whishper_data/db_data:/data/db
       - ./whishper_data/db_data/logs/:/var/log/mongodb/
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${DB_USER:-whishper}
-      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS:-whishper}
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS}
     expose:
       - 27017
-    command: ['--logpath', '/var/log/mongodb/mongod.log']
+    command: [ '--logpath', '/var/log/mongodb/mongod.log' ]
 
   translate:
     container_name: whisper-libretranslate
@@ -41,9 +41,9 @@ services:
       resources:
         reservations:
           devices:
-          - driver: nvidia
-            count: all
-            capabilities: [gpu]
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
 
   whishper:
     pull_policy: always
@@ -75,6 +75,6 @@ services:
       resources:
         reservations:
           devices:
-          - driver: nvidia
-            count: all
-            capabilities: [gpu]
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]

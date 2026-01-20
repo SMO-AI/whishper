@@ -34,6 +34,8 @@ export async function load({ fetch }) {
 		? `${env.PUBLIC_API_HOST}/api/transcriptions`
 		: `${env.PUBLIC_INTERNAL_API_HOST}/api/transcriptions`;
 
+	console.log(`[SSR] Fetching transcriptions from: ${endpoint} (browser: ${browser})`);
+
 	try {
 		const response = await fetch(endpoint, {
 			headers: {

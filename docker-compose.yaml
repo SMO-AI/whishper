@@ -13,8 +13,8 @@ services:
     expose:
       - 27017
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${DB_USER:-whishper}
-      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS:-whishper}
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS}
     command: [ '--logpath', '/var/log/mongodb/mongod.log' ]
 
   translate:
