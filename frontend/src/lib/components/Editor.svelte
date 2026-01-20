@@ -14,6 +14,37 @@
 	let checkingErrors = false;
 	let errors = {}; // Map: segmentId -> correctedText
 
+	async function detectSpeakers() {
+		const num = prompt('Введите ожидаемое количество спикеров (опционально):', '2');
+		let numSpeakers = parseInt(num);
+		if (isNaN(numSpeakers)) numSpeakers = 0;
+
+		const loadingId = toast.loading('ИИ определяет спикеров...');
+		try {
+			const res = await fetch(`${CLIENT_API_HOST}/api/diarize/${$currentTranscription.id}`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${$currentTranscription.token || ''}` // Token might be needed if not in cookies
+				},
+				body: JSON.stringify({ num_speakers: numSpeakers })
+			});
+
+			if (!res.ok) throw new Error(await res.text());
+
+			const updated = await res.json();
+			$currentTranscription = updated;
+			toast.success('Спикеры успешно определены!', { id: loadingId });
+
+			// Update history
+			let currentT = JSON.parse(JSON.stringify($currentTranscription));
+			editorHistory.update((value) => [...value, currentT]);
+		} catch (e) {
+			console.error(e);
+			toast.error('Ошибка распознавания: ' + e.message, { id: loadingId });
+		}
+	}
+
 	async function checkErrors() {
 		if (checkingErrors) return;
 		checkingErrors = true;
@@ -337,6 +368,28 @@
 								Fix All Errors ({Object.keys(errors).length})
 							</button>
 						{/if}
+						<button
+							on:click={detectSpeakers}
+							class="btn btn-xs btn-ghost gap-1 border border-base-content/20 hover:border-primary hover:text-primary transition-all ml-2"
+							disabled={checkingErrors}
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="w-3 h-3"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle
+									cx="9"
+									cy="7"
+									r="4"
+								/><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg
+							>
+							Распознать спикеров
+						</button>
 						<button
 							on:click={checkErrors}
 							class="btn btn-xs btn-ghost gap-1 border border-base-content/20 hover:border-primary hover:text-primary transition-all ml-2"

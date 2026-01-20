@@ -46,7 +46,13 @@ class FasterWhisperBackend(Backend):
             download_model(self.model_size, output_dir=local_model_path, local_files_only=False, cache_dir=local_model_cache)
 
     def transcribe(
-        self, input: np.ndarray, silent: bool = False, language: str = None, task: str = "transcribe"
+        self, 
+        input: np.ndarray, 
+        silent: bool = False, 
+        language: str = None, 
+        task: str = "transcribe",
+        diarize: bool = False,
+        num_speakers: int = None
     ) -> Transcription:
         """
         Return word level transcription data.

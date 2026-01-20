@@ -140,6 +140,15 @@ func (s *Server) RegisterRoutes() {
 		return err
 	})
 
+	s.Router.Post("/api/diarize/:id", func(c *fiber.Ctx) error {
+		log.Debug().Msgf("POST /api/diarize/%v", c.Params("id"))
+		err := s.handlePostDiarize(c)
+		if err != nil {
+			log.Error().Err(err).Msg("Error handling POST /api/diarize/:id")
+		}
+		return err
+	})
+
 	// Register HTTP route for receiving the form data and creating new transcription job.
 	s.Router.Post("/api/transcriptions", func(c *fiber.Ctx) error {
 		log.Debug().Msg("POST /api/transcriptions")

@@ -21,6 +21,8 @@ type Transcription struct {
 	UserID       string             `bson:"userId" json:"userId"`
 	Result       WhisperResult      `bson:"result" json:"result"`
 	Translations []Translation      `bson:"translations" json:"translations"`
+	Diarize      bool               `bson:"diarize" json:"diarize"`
+	NumSpeakers  int                `bson:"numSpeakers" json:"numSpeakers"`
 }
 
 func (t *Transcription) Translate(target string) error {

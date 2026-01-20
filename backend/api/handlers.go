@@ -1,8 +1,11 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
+	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/goccy/go-json"
@@ -148,6 +151,12 @@ func (s *Server) handlePostTranscription(c *fiber.Ctx) error {
 	transcription.ModelSize = c.FormValue("modelSize")
 	transcription.FileName = filename
 	transcription.Status = models.TranscriptionStatusPending
+	transcription.Diarize = c.FormValue("diarize") == "true"
+	if numSpeakers := c.FormValue("numSpeakers"); numSpeakers != "" {
+		if n, err := strconv.Atoi(numSpeakers); err == nil {
+			transcription.NumSpeakers = n
+		}
+	}
 	transcription.Task = c.FormValue("task")
 	if transcription.Task == "" {
 		transcription.Task = "transcribe"
@@ -363,4 +372,83 @@ func (s *Server) handleDownloadFile(c *fiber.Ctx) error {
 
 	filepath := fmt.Sprintf("%v/%v", os.Getenv("UPLOAD_DIR"), filename)
 	return c.SendFile(filepath)
+}
+func (s *Server) handlePostDiarize(c *fiber.Ctx) error {
+	token := c.Get("Authorization")
+	if len(token) > 7 && token[:7] == "Bearer " {
+		token = token[7:]
+	} else {
+		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	}
+
+	user, err := ValidateToken(token)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+	}
+
+	id := c.Params("id")
+	transcription := s.Db.GetTranscription(id)
+	if transcription == nil {
+		return fiber.NewError(fiber.StatusNotFound, "Not found")
+	}
+
+	if transcription.UserID != user.ID {
+		return fiber.NewError(fiber.StatusForbidden, "Forbidden")
+	}
+
+	var body struct {
+		NumSpeakers int `json:"num_speakers"`
+	}
+	if err := c.BodyParser(&body); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "Invalid request body")
+	}
+
+	// Prepare request to Python service
+	pythonDiarizeURL := fmt.Sprintf("http://%v/diarize/", os.Getenv("ASR_ENDPOINT"))
+
+	payload := map[string]interface{}{
+		"segments":     transcription.Result.Segments,
+		"num_speakers": body.NumSpeakers,
+	}
+
+	jsonPayload, _ := json.Marshal(payload)
+
+	// Create request
+	req, _ := http.NewRequest("POST", pythonDiarizeURL, bytes.NewBuffer(jsonPayload))
+	req.Header.Set("Content-Type", "application/json")
+	if token != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
+	}
+
+	client := &http.Client{Timeout: 60 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Error().Err(err).Msg("Error calling Python diarize endpoint")
+		return fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		log.Error().Int("status", resp.StatusCode).Msg("Python diarize endpoint returned non-200")
+		return fiber.NewError(fiber.StatusInternalServerError, "Diarization failed")
+	}
+
+	var diarizeResult struct {
+		Segments []models.Segment `json:"segments"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&diarizeResult); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Error decoding result")
+	}
+
+	// Update segments in transcription
+	transcription.Result.Segments = diarizeResult.Segments
+
+	// Save to DB
+	ut, err := s.Db.UpdateTranscription(transcription)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Error saving to database")
+	}
+
+	s.BroadcastTranscription(ut)
+	return c.JSON(ut)
 }

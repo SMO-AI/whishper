@@ -9,6 +9,7 @@ import numpy as np
 from typing import Union, Optional
 from groq import Groq, RateLimitError, InternalServerError, APIConnectionError
 from .backend import Backend, Transcription, Segment, WordData
+from processors.diarizer import LlamaDiarizer
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +32,9 @@ class GroqBackend(Backend):
     def transcribe(self, input_data: Union[np.ndarray, str], 
                   silent: bool = False, 
                   language: Optional[str] = None, 
-                  task: str = "transcribe") -> Transcription:
+                  task: str = "transcribe",
+                  diarize: bool = False,
+                  num_speakers: Optional[int] = None) -> Transcription:
         """
         Transcribes audio using Groq API with robust retry logic and word-level timestamps.
         """
@@ -116,10 +119,25 @@ class GroqBackend(Backend):
                 "words": words_data
             })
 
-        return {
+        result = {
             "text": completion.text,
             "language": getattr(completion, 'language', language or 'unknown'),
             "duration": completion.duration,
             "segments": segments,
             "processing_duration": 0.0 # Will be set by caller
         }
+
+        if diarize:
+            import asyncio
+            diarizer = LlamaDiarizer(api_key=os.environ.get("GROQ_API_KEY"))
+            # We are running inside a thread (run_inference), so we might need a separate loop or just run sync if possible.
+            # But LlamaDiarizer.diarize is async. Let's make a small helper or run it in a new loop.
+            try:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                result["segments"] = loop.run_until_complete(diarizer.diarize(result["segments"], num_speakers))
+                loop.close()
+            except Exception as e:
+                logger.error(f"Diarization failed: {e}")
+
+        return result

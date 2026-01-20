@@ -15,6 +15,8 @@
 	let fileInput;
 	let device = env.PUBLIC_WHISHPER_PROFILE == 'gpu' ? 'cuda' : 'cpu';
 	let task = 'transcribe';
+	let diarize = false;
+	let numSpeakers = 2;
 	let activeTab = 'file'; // 'file' or 'url';
 
 	let languages = [
@@ -48,6 +50,8 @@
 		formData.append('language', language);
 		formData.append('modelSize', modelSize);
 		formData.append('task', task);
+		formData.append('diarize', diarize.toString());
+		formData.append('numSpeakers', numSpeakers.toString());
 		if (device == 'cuda' || device == 'cpu') {
 			formData.append('device', device);
 		} else {
@@ -413,6 +417,76 @@
 						{/each}
 					</select>
 				</div>
+
+				<div class="form-control col-span-1 md:col-span-2 mt-2">
+					<label
+						class="label cursor-pointer justify-start gap-4 p-4 rounded-2xl bg-base-200/50 hover:bg-base-200 transition-colors border border-base-content/5"
+					>
+						<input type="checkbox" bind:checked={diarize} class="toggle toggle-primary" />
+						<div class="flex flex-col">
+							<span class="label-text font-bold">Распознавание спикеров</span>
+							<span class="text-xs opacity-60"
+								>Разделение на голоса и определение ролей (например, Врач, Пациент)</span
+							>
+						</div>
+					</label>
+				</div>
+
+				{#if diarize}
+					<div
+						class="form-control col-span-1 md:col-span-2 mt-1 animate-in fade-in slide-in-from-top-2 duration-300"
+					>
+						<div
+							class="flex items-center gap-4 bg-primary/5 p-4 rounded-2xl border border-primary/10"
+						>
+							<div class="flex flex-col flex-1">
+								<span class="label-text font-bold">Количество спикеров</span>
+								<span class="text-xs opacity-60"
+									>Указание примерного числа улучшает точность распознавания</span
+								>
+							</div>
+							<div class="flex items-center gap-2">
+								<input
+									type="number"
+									min="1"
+									max="10"
+									bind:value={numSpeakers}
+									class="input input-bordered input-sm w-20 text-center font-bold"
+								/>
+								<div class="flex flex-col gap-0.5">
+									<button
+										type="button"
+										class="btn btn-xs btn-ghost p-0 h-4 min-h-0"
+										on:click={() => numSpeakers++}
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="w-3 h-3"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="3"><path d="M18 15l-6-6-6 6" /></svg
+										>
+									</button>
+									<button
+										type="button"
+										class="btn btn-xs btn-ghost p-0 h-4 min-h-0"
+										on:click={() => (numSpeakers = Math.max(1, numSpeakers - 1))}
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="w-3 h-3"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="3"><path d="M6 9l6 6 6-6" /></svg
+										>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				{/if}
 			</div>
 		</div>
 

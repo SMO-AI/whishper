@@ -74,7 +74,7 @@ func DownloadMedia(t *models.Transcription) (string, error) {
 }
 
 func SendTranscriptionRequest(t *models.Transcription, body *bytes.Buffer, writer *multipart.Writer) (*models.WhisperResult, error) {
-	url := fmt.Sprintf("http://%v/transcribe/?model_size=%v&task=%v&language=%v&device=%v", os.Getenv("ASR_ENDPOINT"), t.ModelSize, t.Task, t.Language, t.Device)
+	url := fmt.Sprintf("http://%v/transcribe/?model_size=%v&task=%v&language=%v&device=%v&diarize=%v&num_speakers=%v", os.Getenv("ASR_ENDPOINT"), t.ModelSize, t.Task, t.Language, t.Device, t.Diarize, t.NumSpeakers)
 	// Send transcription request to transcription service
 	req, err := http.NewRequest("POST", url, body)
 	if err != nil {

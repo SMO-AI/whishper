@@ -18,7 +18,10 @@ Segment = TypedDict(
         "end": float | str,
         "score": float,
         "words": list[WordData],
+        "speaker": str,
+        "role": str,
     },
+    total=False,
 )
 
 Transcription = TypedDict(
@@ -41,16 +44,9 @@ class Backend:
             raise ValueError(f"model must be one of {self.supported_model_sizes()}")
 
     def supported_backends(self):
-        """
-        This is of not much use as of the moment, If we ever support multiple
-        backends this can be utilized.
-        """
         return ["faster-whisper"]
 
     def model_path(self) -> str:
-        """
-        Returns the local path to the model, error-out if unavailable
-        """
         raise NotImplementedError()
 
     def supported_model_sizes(self) -> list[str]:
@@ -62,8 +58,11 @@ class Backend:
     def load(self):
         raise NotImplementedError()
 
-    def transcribe(self, input: np.ndarray, silent: bool = False, language: str = None, task: str = "transcribe") -> Transcription:
-        """
-        This should return word level transcription data.
-        """
+    def transcribe(self, 
+                  input: np.ndarray, 
+                  silent: bool = False, 
+                  language: str = None, 
+                  task: str = "transcribe",
+                  diarize: bool = False,
+                  num_speakers: int = None) -> Transcription:
         raise NotImplementedError()

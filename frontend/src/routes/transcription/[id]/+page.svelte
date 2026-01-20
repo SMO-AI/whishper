@@ -3,10 +3,11 @@
 	import toast, { Toaster } from 'svelte-french-toast';
 	import { fade } from 'svelte/transition';
 	import { onMount } from 'svelte';
-	import { CLIENT_API_HOST } from '$lib/utils';
+	import { CLIENT_API_HOST, downloadSRT, downloadVTT, downloadTXT, downloadJSON } from '$lib/utils';
 
 	let showTimestamps = false;
 	let transcriptionText = '';
+	let showSpeakers = false;
 
 	// Helpers for formatting
 	const formatTime = (seconds) => {
@@ -26,8 +27,35 @@
 
 	// Reactive text generation based on toggle
 	$: if ($currentTranscription) {
-		if (showTimestamps) {
-			transcriptionText = $currentTranscription.result.segments
+		let segments = $currentTranscription.result.segments;
+		if (showSpeakers) {
+			let groupedText = [];
+			let lastSpeaker = null;
+			let currentGroup = [];
+
+			segments.forEach((s) => {
+				const speaker = s.speaker || 'Speaker ?';
+				const text = s.text.trim();
+				const timeStr = showTimestamps ? `[${formatTime(s.start)} - ${formatTime(s.end)}] ` : '';
+
+				if (speaker !== lastSpeaker) {
+					if (currentGroup.length > 0) {
+						groupedText.push(`${lastSpeaker}:\n${currentGroup.join(' ')}\n`);
+					}
+					lastSpeaker = speaker;
+					currentGroup = [timeStr + text];
+				} else {
+					currentGroup.push(timeStr + text);
+				}
+			});
+
+			if (currentGroup.length > 0) {
+				groupedText.push(`${lastSpeaker}:\n${currentGroup.join(' ')}\n`);
+			}
+
+			transcriptionText = groupedText.join('\n');
+		} else if (showTimestamps) {
+			transcriptionText = segments
 				.map((s) => `[${formatTime(s.start)} - ${formatTime(s.end)}] ${s.text.trim()}`)
 				.join('\n');
 		} else {
@@ -38,18 +66,31 @@
 	const copyToClipboard = () => {
 		navigator.clipboard.writeText(transcriptionText).then(
 			() => {
-				toast.success('Text copied to clipboard!');
+				toast.success('Текст скопирован!');
 			},
 			() => {
-				toast.error('Failed to copy text.');
+				toast.error('Ошибка копирования.');
 			}
 		);
 	};
 
-	// Download handlers (simplified reusing existing utils or custom logic)
+	// Download handlers (client-side generation for speed and reliability)
 	const downloadFile = (format) => {
-		const id = $currentTranscription.id;
-		window.location.href = `${CLIENT_API_HOST}/api/download/${id}?format=${format}`;
+		const segments = $currentTranscription.result.segments;
+		const fileName = $currentTranscription.fileName;
+		const cleanTitle = fileName.includes('_WHSHPR_') ? fileName.split('_WHSHPR_')[1] : fileName;
+		const title = cleanTitle.split('.')[0]; // Remove extension
+
+		if (format === 'srt') {
+			downloadSRT(segments, title);
+		} else if (format === 'vtt') {
+			downloadVTT(segments, title);
+		} else if (format === 'txt') {
+			// Respect current view (speakers/timestamps) for TXT export
+			downloadTXT(transcriptionText, title);
+		} else if (format === 'json') {
+			downloadJSON($currentTranscription.result, title);
+		}
 	};
 
 	let wordCount = 0;
@@ -118,7 +159,7 @@
 							d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
 						/></svg
 					>
-					Open Editor
+					Открыть редактор
 				</a>
 			</div>
 		</div>
@@ -129,7 +170,7 @@
 				<!-- Info Card -->
 				<div class="card bg-base-200/50 border border-base-content/5 shadow-sm">
 					<div class="card-body p-6">
-						<h3 class="card-title text-base uppercase font-bold opacity-60 mb-4">Details</h3>
+						<h3 class="card-title text-base uppercase font-bold opacity-60 mb-4">Информация</h3>
 
 						<div class="space-y-4">
 							<div class="flex justify-between items-center pb-3 border-b border-base-content/5">
@@ -145,7 +186,7 @@
 										stroke-linejoin="round"
 										><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg
 									>
-									Duration
+									Длительность
 								</span>
 								<span class="font-mono font-bold"
 									>{formatTime($currentTranscription.result.duration)}</span
@@ -166,7 +207,7 @@
 											d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
 										/></svg
 									>
-									Word Count
+									Кол-во слов
 								</span>
 								<span class="font-mono font-bold">{wordCount}</span>
 							</div>
@@ -185,7 +226,7 @@
 											d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
 										/></svg
 									>
-									Language
+									Язык
 								</span>
 								<span class="badge badge-neutral font-bold uppercase"
 									>{$currentTranscription.result.language}</span
@@ -211,7 +252,7 @@
 											y2="12"
 										/></svg
 									>
-									Model
+									Модель
 								</span>
 								<span class="badge badge-outline font-mono text-xs"
 									>{$currentTranscription.modelSize}</span
@@ -224,7 +265,7 @@
 				<!-- Downloads Card -->
 				<div class="card bg-base-200/50 border border-base-content/5 shadow-sm">
 					<div class="card-body p-6">
-						<h3 class="card-title text-base uppercase font-bold opacity-60 mb-4">Download</h3>
+						<h3 class="card-title text-base uppercase font-bold opacity-60 mb-4">Скачать</h3>
 						<div class="grid grid-cols-2 gap-3">
 							<button class="btn btn-outline btn-sm" on:click={() => downloadFile('srt')}
 								>SRT</button
@@ -250,16 +291,24 @@
 					<div
 						class="p-4 border-b border-base-content/10 flex justify-between items-center bg-base-200/30 rounded-t-2xl"
 					>
-						<div class="flex items-center gap-4">
-							<h3 class="font-bold text-lg">Transcript</h3>
+						<div class="flex flex-wrap items-center gap-4">
+							<h3 class="font-bold text-lg">Транскрипт</h3>
 							<label class="label cursor-pointer gap-2 hover:opacity-100 transition-opacity">
 								<span class="label-text text-xs uppercase font-bold opacity-60"
-									>Show Timestamps</span
+									>Временные метки</span
 								>
 								<input
 									type="checkbox"
 									class="toggle toggle-primary toggle-sm"
 									bind:checked={showTimestamps}
+								/>
+							</label>
+							<label class="label cursor-pointer gap-2 hover:opacity-100 transition-opacity">
+								<span class="label-text text-xs uppercase font-bold opacity-60">По ролям</span>
+								<input
+									type="checkbox"
+									class="toggle toggle-secondary toggle-sm"
+									bind:checked={showSpeakers}
 								/>
 							</label>
 						</div>
@@ -278,7 +327,7 @@
 									d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
 								/></svg
 							>
-							Copy
+							Копировать
 						</button>
 					</div>
 

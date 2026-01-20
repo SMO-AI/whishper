@@ -6,7 +6,7 @@ import uvicorn
 import os
 import time
 from enum import Enum
-from typing import Annotated, Optional
+from typing import Annotated, Optional, Dict
 from backends.fasterwhisper import FasterWhisperBackend
 from supabase import create_client, Client
 from pydantic import BaseModel
@@ -58,6 +58,28 @@ async def get_current_user(authorization: Annotated[str | None, Header()] = None
         print(f"Auth Error: {e}")
         return None
 
+@app.post("/diarize/")
+async def diarize_endpoint(
+    data: Dict,
+    ctx: Annotated[UserContext | None, Depends(get_current_user)] = None
+):
+    segments = data.get("segments", [])
+    num_speakers = data.get("num_speakers")
+    
+    if not segments:
+        return {"segments": []}
+    
+    from processors.diarizer import LlamaDiarizer
+    diarizer = LlamaDiarizer(api_key=os.environ.get("GROQ_API_KEY"))
+    
+    # Run diarization
+    try:
+        updated_segments = await diarizer.diarize(segments, num_speakers)
+        return {"segments": updated_segments}
+    except Exception as e:
+        print(f"Diarization error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/transcribe/")
 async def transcribe_endpoint(
     ctx: Annotated[UserContext | None, Depends(get_current_user)] = None,
@@ -66,7 +88,9 @@ async def transcribe_endpoint(
     model_size: ModelSize = ModelSize.small, 
     language: Languages = Languages.auto,
     device: str = "cpu",
-    task: str = "transcribe"
+    task: str = "transcribe",
+    diarize: bool = False,
+    num_speakers: Optional[int] = None
 ):
     user = ctx.user if ctx else None
     token = ctx.token if ctx else None
@@ -90,10 +114,10 @@ async def transcribe_endpoint(
             # Reset file cursor for transcription
             await file.seek(0) 
             
-        result = await transcribe_file(file, model_size.value, language.value, device, task)
+        result = await transcribe_file(file, model_size.value, language.value, device, task, diarize, num_speakers)
     elif filename is not None:
         saved_filename = filename
-        result = await transcribe_from_filename(filename, model_size.value, language.value, device, task)
+        result = await transcribe_from_filename(filename, model_size.value, language.value, device, task, diarize, num_speakers)
     else:
         return {"detail": "No file uploaded"}
 

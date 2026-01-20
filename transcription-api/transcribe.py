@@ -16,7 +16,9 @@ async def transcribe_from_filename(filename: str,
                                     model_size: str,
                                     language: Optional[str] = None,
                                     device: DeviceType = DeviceType.cpu,
-                                    task: str = "transcribe") -> Transcription:
+                                    task: str = "transcribe",
+                                    diarize: bool = False,
+                                    num_speakers: Optional[int] = None) -> Transcription:
     
     filepath = os.path.join(os.environ["UPLOAD_DIR"], filename)
     if not os.path.exists(filepath):
@@ -24,16 +26,18 @@ async def transcribe_from_filename(filename: str,
     
     # Optimization: For Groq API, pass the file path directly to avoid expensive decoding to np.ndarray
     if model_size.startswith("groq:"):
-        return await transcribe_audio(filepath, model_size, language, device, task)
+        return await transcribe_audio(filepath, model_size, language, device, task, diarize, num_speakers)
         
     audio = convert_audio(filepath)
-    return await transcribe_audio(audio, model_size, language, device, task)
+    return await transcribe_audio(audio, model_size, language, device, task, diarize, num_speakers)
 
 async def transcribe_file(file: io.BytesIO, 
                           model_size: str, 
                           language: Optional[str] = None, 
                           device: DeviceType = DeviceType.cpu,
-                          task: str = "transcribe") -> Transcription:
+                          task: str = "transcribe",
+                          diarize: bool = False,
+                          num_speakers: Optional[int] = None) -> Transcription:
     contents = await file.read()  # async read
     
     # Optimization: For Groq API, just pass the raw bytes via BytesIO if it's small, 
@@ -51,13 +55,13 @@ async def transcribe_file(file: io.BytesIO,
             f.write(contents)
         
         if model_size.startswith("groq:"):
-             res = await transcribe_audio(temp_filename, model_size, language, device, task)
+             res = await transcribe_audio(temp_filename, model_size, language, device, task, diarize, num_speakers)
              os.remove(temp_filename)
              return res
 
         audio = convert_audio(temp_filename)
         os.remove(temp_filename)
-    return await transcribe_audio(audio, model_size, language, device, task)
+    return await transcribe_audio(audio, model_size, language, device, task, diarize, num_speakers)
 
 from typing import Union
 import uuid
@@ -66,7 +70,9 @@ async def transcribe_audio(audio: Union[np.ndarray, str],
                            model_size: str,
                            language: Optional[str] = None, 
                            device: DeviceType = DeviceType.cpu,
-                           task : str = "transcribe") -> Transcription:
+                           task : str = "transcribe",
+                           diarize: bool = False,
+                           num_speakers: Optional[int] = None) -> Transcription:
     
     if language == "auto":
         language = None
@@ -83,7 +89,7 @@ async def transcribe_audio(audio: Union[np.ndarray, str],
         model.load()
         # Transcribe the data (might be ndarray or filepath)
         start_time = time.time()
-        result = model.transcribe(audio, silent=True, language=language, task=task)
+        result = model.transcribe(audio, silent=True, language=language, task=task, diarize=diarize, num_speakers=num_speakers)
         end_time = time.time()
         result["processing_duration"] = end_time - start_time
         return result

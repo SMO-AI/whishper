@@ -6,6 +6,7 @@
 	export let translationIndex;
 	export let error = null;
 
+	import toast from 'svelte-french-toast';
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
 
@@ -132,6 +133,28 @@
 		}
 	}
 
+	function renameSpeaker() {
+		const newName = prompt(`Rename speaker "${segment.speaker}" to:`, segment.speaker);
+		if (newName && newName !== segment.speaker) {
+			const oldName = segment.speaker;
+			const source =
+				translationIndex == -1
+					? $currentTranscription.result.segments
+					: $currentTranscription.translations[translationIndex].result.segments;
+
+			// Update all segments with this speaker
+			source.forEach((s) => {
+				if (s.speaker === oldName) {
+					s.speaker = newName;
+				}
+			});
+
+			$currentTranscription = { ...$currentTranscription };
+			handleHistory();
+			toast.success(`Renamed all segments of "${oldName}" to "${newName}"`);
+		}
+	}
+
 	$: if (segment.start <= $currentVideoPlayerTime && $currentVideoPlayerTime <= segment.end) {
 		isActive = true;
 	} else {
@@ -156,6 +179,25 @@
 			: 'border-base-content/5 group-hover:border-primary/50'}"
 	>
 		<div class="font-mono text-xs opacity-40 font-bold ml-2">#{index + 1}</div>
+		{#if segment.speaker}
+			<div class="mt-2 ml-2 flex flex-col gap-1">
+				<button
+					class="badge badge-outline border-primary/30 text-[10px] py-3 px-2 font-bold truncate max-w-[80px] cursor-pointer hover:bg-primary/5 transition-colors tooltip tooltip-right flex items-center justify-center h-auto"
+					title="Click to rename this speaker globally"
+					on:click|stopPropagation={renameSpeaker}
+				>
+					{segment.speaker}
+				</button>
+				{#if segment.role}
+					<div
+						class="badge badge-ghost text-[9px] py-1 px-1 opacity-70 truncate max-w-[80px]"
+						title={segment.role}
+					>
+						{segment.role}
+					</div>
+				{/if}
+			</div>
+		{/if}
 	</td>
 
 	<!-- Timing Column -->
