@@ -37,21 +37,17 @@ services:
     expose:
       - 80
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost/health-check" ]
-      interval: 30s
-      timeout: 10s
+      test: [ "CMD", "curl", "-f", "http://127.0.0.1/health-check" ]
+      interval: 10s
+      timeout: 5s
       retries: 3
-      start_period: 40s
+      start_period: 15s
     labels:
       - "coolify.managed=true"
       - "traefik.enable=true"
-      - "traefik.http.routers.scriptus-main.rule=Host(`scriptus.online`) || Host(`www.scriptus.online`)"
-      - "traefik.http.routers.scriptus-main.entrypoints=web,websecure"
-      - "traefik.http.routers.scriptus-main.tls=true"
-      - "traefik.http.routers.scriptus-main.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.scriptus-main.priority=10000"
-      - "traefik.http.routers.scriptus-main.service=scriptus-main"
-      - "traefik.http.services.scriptus-main.loadbalancer.server.port=80"
+      - "traefik.http.routers.scriptus-app.rule=Host(`scriptus.online`) || Host(`www.scriptus.online`)"
+      - "traefik.http.routers.scriptus-app.priority=10000"
+      - "traefik.http.services.scriptus-app.loadbalancer.server.port=80"
 
     volumes:
       - uploads:/app/uploads
