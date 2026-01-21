@@ -46,7 +46,13 @@ services:
       - "coolify.managed=true"
       - "traefik.enable=true"
       - "traefik.http.routers.scriptus-app.rule=Host(`scriptus.online`) || Host(`www.scriptus.online`)"
+      - "traefik.http.routers.scriptus-app.entrypoints=websecure"
       - "traefik.http.routers.scriptus-app.priority=10000"
+      - "traefik.http.routers.scriptus-app.tls=true"
+      - "traefik.http.routers.scriptus-app.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.scriptus-app-http.rule=Host(`scriptus.online`) || Host(`www.scriptus.online`)"
+      - "traefik.http.routers.scriptus-app-http.entrypoints=web"
+      - "traefik.http.routers.scriptus-app-http.priority=10000"
       - "traefik.http.services.scriptus-app.loadbalancer.server.port=80"
 
     volumes:
