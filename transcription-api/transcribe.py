@@ -24,12 +24,12 @@ async def transcribe_from_filename(filename: str,
     if not os.path.exists(filepath):
         raise RuntimeError(f"file not found in {filepath}")
     
-    # Optimization: For Groq API, pass the file path directly to avoid expensive decoding to np.ndarray
-    if model_size.startswith("groq:"):
-        return await transcribe_audio(filepath, model_size, language, device, task, diarize, num_speakers)
-        
-    audio = convert_audio(filepath)
-    return await transcribe_audio(audio, model_size, language, device, task, diarize, num_speakers)
+    # Pass the filepath directly to transcribe_audio.
+    # This allows:
+    # 1. Groq backend to detect proper file extension.
+    # 2. Pyannote to receive a valid file path for diarization.
+    # 3. FasterWhisper to handle loading efficiently.
+    return await transcribe_audio(filepath, model_size, language, device, task, diarize, num_speakers)
 
 async def transcribe_file(file: io.BytesIO, 
                           model_size: str, 

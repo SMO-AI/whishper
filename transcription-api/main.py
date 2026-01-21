@@ -111,10 +111,11 @@ async def transcribe_endpoint(
             # Read from UploadFile (which is Spooled)
             content = await file.read() 
             buffer.write(content)
-            # Reset file cursor for transcription
-            await file.seek(0) 
             
-        result = await transcribe_file(file, model_size.value, language.value, device, task, diarize, num_speakers)
+        print(f"File saved to {file_path}")
+        
+        # Use transcribe_from_filename to reuse the saved file and preserve extension/path for Groq/Pyannote
+        result = await transcribe_from_filename(saved_filename, model_size.value, language.value, device, task, diarize, num_speakers)
     elif filename is not None:
         saved_filename = filename
         result = await transcribe_from_filename(filename, model_size.value, language.value, device, task, diarize, num_speakers)
