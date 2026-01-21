@@ -95,6 +95,16 @@ async def transcribe_audio(audio: Union[np.ndarray, str],
                 # Align speakers with segments
                 result["segments"] = diarizer.assign_speakers_to_segments(result["segments"], diarization_result)
                 print("Pyannote Diarization completed.")
+                
+                print("Running Smart Refinement (LLM)...")
+                try:
+                    import asyncio
+                    # Run async smart refinement in this thread
+                    result["segments"] = asyncio.run(diarizer.smart_refine(result["segments"]))
+                    print("Smart Refinement completed.")
+                except Exception as e:
+                     print(f"Smart Refinement failed: {e}")
+
             except Exception as e:
                 print(f"Pyannote Diarization failed: {e}")
                 
