@@ -40,8 +40,8 @@ services:
       test: [ "CMD", "curl", "-f", "http://127.0.0.1/health-check" ]
       interval: 10s
       timeout: 5s
-      retries: 3
-      start_period: 15s
+      retries: 5
+      start_period: 30s
     labels:
       - "coolify.managed=true"
       - "traefik.enable=true"
