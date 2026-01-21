@@ -1,3 +1,4 @@
+fastapi
 faster-whisper>=1.0.0
 python-dotenv
 uvicorn
