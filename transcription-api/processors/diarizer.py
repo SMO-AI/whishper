@@ -1,9 +1,16 @@
+
 import os
 import json
 import logging
 import asyncio
 from typing import List, Dict, Optional
 from groq import Groq
+import torch
+
+try:
+    from pyannote.audio import Pipeline
+except ImportError:
+    Pipeline = None
 
 logger = logging.getLogger(__name__)
 
@@ -117,5 +124,101 @@ class LlamaDiarizer:
         for i, seg in enumerate(segments):
             seg["speaker"] = segments_to_process[i].get("speaker", "Speaker ?")
             seg["role"] = segments_to_process[i].get("role", "Unknown")
+        
+        return segments
+
+
+class PyannoteDiarizer:
+    def __init__(self, auth_token: str = None):
+        self.auth_token = auth_token or os.environ.get("HF_TOKEN")
+        if not self.auth_token:
+            logger.error("HF_TOKEN missing for PyannoteDiarizer")
+        
+        self.pipeline = None
+        if Pipeline:
+            try:                
+                # Use CUDA if available
+                device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+                
+                self.pipeline = Pipeline.from_pretrained(
+                    "pyannote/speaker-diarization-3.1",
+                    use_auth_token=self.auth_token
+                )
+                if self.pipeline:
+                    self.pipeline.to(device)
+            except Exception as e:
+                logger.error(f"Failed to initialize Pyannote pipeline: {e}")
+
+    def run_diarization(self, audio_path: str, num_speakers: Optional[int] = None):
+        if not self.pipeline:
+            raise RuntimeError("Pyannote pipeline not initialized")
+        
+        try:
+            diarization = self.pipeline(audio_path, num_speakers=num_speakers)
+            return diarization
+        except Exception as e:
+            logger.error(f"Pyannote inference error: {e}")
+            raise
+
+    def assign_speakers_to_segments(self, segments: List[Dict], diarization) -> List[Dict]:
+        """
+        Aligns Pyannote speaker turns with Whisper segments.
+        Iterates through words in segments to find the most overlapping speaker.
+        """
+        # Convert diarization to list of turns for faster lookup
+        # turn: (start, end, speaker)
+        turns = []
+        for turn, _, speaker in diarization.itertracks(yield_label=True):
+            turns.append({
+                "start": turn.start,
+                "end": turn.end,
+                "speaker": speaker
+            })
+            
+        # Helper to find speaker for a time range
+        def find_speaker(start, end):
+            max_overlap = 0
+            best_speaker = None
+            
+            seg_center = (start + end) / 2
+            
+            # Simple check: find turn containing center
+            # For more precision, we could calculate exact overlap duration
+            for turn in turns:
+                # Check for overlap
+                overlap_start = max(start, turn["start"])
+                overlap_end = min(end, turn["end"])
+                overlap_duration = max(0, overlap_end - overlap_start)
+                
+                if overlap_duration > max_overlap:
+                    max_overlap = overlap_duration
+                    best_speaker = turn["speaker"]
+            
+            return best_speaker
+
+        # Assign speakers to each word, then consensus for segment
+        for segment in segments:
+            speaker_counts = {}
+            total_duration = segment.get("end", 0) - segment.get("start", 0)
+            
+            # If we have word timestamps (which we should from Faster Whisper)
+            if "words" in segment and segment["words"]:
+                for word in segment["words"]:
+                    spk = find_speaker(word["start"], word["end"])
+                    if spk:
+                        word["speaker"] = spk
+                        speaker_counts[spk] = speaker_counts.get(spk, 0) + (word["end"] - word["start"])
+            else:
+                # Fallback to segment level
+                spk = find_speaker(segment["start"], segment["end"])
+                if spk:
+                    speaker_counts[spk] = total_duration
+
+            # Determine dominant speaker for the segment
+            if speaker_counts:
+                dominant_speaker = max(speaker_counts, key=speaker_counts.get)
+                segment["speaker"] = dominant_speaker
+            else:
+                segment["speaker"] = "Unknown"  # Or keep existing/null
         
         return segments

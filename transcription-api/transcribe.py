@@ -40,28 +40,17 @@ async def transcribe_file(file: io.BytesIO,
                           num_speakers: Optional[int] = None) -> Transcription:
     contents = await file.read()  # async read
     
-    # Optimization: For Groq API, just pass the raw bytes via BytesIO if it's small, 
-    # but currently transcribe_audio expects ndarray or path. 
-    # Let's stick to the current logic of saving/decoding for local models, 
-    # but for Groq we could ideally pass BytesIO. 
-    # However, chunking (handled in Go) ensures we handle large files as paths.
-
-    if len(contents) < 150 * 1024 * 1024:  # file is smaller than 150MB
-            audio = convert_audio(io.BytesIO(contents))
-    else:
-         # Save the uploaded file temporarily on disk
-        temp_filename = f"temp_{int(time.time())}_{uuid.uuid4().hex}.audio"
+    # We save to a temp file to allow Pyannote (and Faster Whisper) to access the file directly.
+    # This is also more memory efficient than holding the numpy array in memory.
+    temp_filename = f"temp_{int(time.time())}_{uuid.uuid4().hex}.audio"
+    try:
         with open(temp_filename, 'wb') as f:
             f.write(contents)
         
-        if model_size.startswith("groq:"):
-             res = await transcribe_audio(temp_filename, model_size, language, device, task, diarize, num_speakers)
-             os.remove(temp_filename)
-             return res
-
-        audio = convert_audio(temp_filename)
-        os.remove(temp_filename)
-    return await transcribe_audio(audio, model_size, language, device, task, diarize, num_speakers)
+        return await transcribe_audio(temp_filename, model_size, language, device, task, diarize, num_speakers)
+    finally:
+        if os.path.exists(temp_filename):
+            os.remove(temp_filename)
 
 from typing import Union
 import uuid
@@ -87,11 +76,28 @@ async def transcribe_audio(audio: Union[np.ndarray, str],
         
         model.get_model()
         model.load()
+        
         # Transcribe the data (might be ndarray or filepath)
         start_time = time.time()
         result = model.transcribe(audio, silent=True, language=language, task=task, diarize=diarize, num_speakers=num_speakers)
         end_time = time.time()
         result["processing_duration"] = end_time - start_time
+        
+        # Apply Pyannote Diarization if requested and not using Groq (Groq handles it differently or upstream)
+        # We only run this if audio is a string (filepath), which it should be now.
+        if diarize and isinstance(audio, str) and not model_size.startswith("groq:"):
+            print("Running Pyannote Diarization...")
+            try:
+                from processors.diarizer import PyannoteDiarizer
+                diarizer = PyannoteDiarizer()
+                # Run diarization
+                diarization_result = diarizer.run_diarization(audio, num_speakers=num_speakers)
+                # Align speakers with segments
+                result["segments"] = diarizer.assign_speakers_to_segments(result["segments"], diarization_result)
+                print("Pyannote Diarization completed.")
+            except Exception as e:
+                print(f"Pyannote Diarization failed: {e}")
+                
         return result
 
     import asyncio
