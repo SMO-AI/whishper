@@ -41,7 +41,7 @@ RUN python3 -m pip install --no-cache-dir --break-system-packages yt-dlp
 COPY ./transcription-api /app/transcription
 WORKDIR /app/transcription
 RUN python3 -m pip install --no-cache-dir --break-system-packages --upgrade pip && \
-    python3 -m pip install --no-cache-dir --break-system-packages torch torchaudio && \
+    python3 -m pip install --no-cache-dir --break-system-packages torch torchaudio --index-url https://download.pytorch.org/whl/cpu && \
     python3 -m pip install --no-cache-dir --break-system-packages -r requirements.txt && \
     python3 -m pip install --no-cache-dir --break-system-packages python-multipart
 
