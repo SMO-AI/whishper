@@ -141,7 +141,7 @@ class PyannoteDiarizer:
                 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
                 
                 self.pipeline = Pipeline.from_pretrained(
-                    "pyannote/speaker-diarization",
+                    "pyannote/speaker-diarization-3.1",
                     use_auth_token=self.auth_token
                 )
                 if self.pipeline:
