@@ -324,10 +324,6 @@ class PyannoteDiarizer:
             # Strategy: ask LLM to return `id`: `speaker` map?
             # Better: Ask LLM to output list of {id, speaker}.
             
-        except Exception as e:
-            logger.error(f"Smart refinement failed: {e}")
-            return segments
-
             # Create a map for ID -> Speaker
             id_speaker_map = {}
             for item in corrected_list:
