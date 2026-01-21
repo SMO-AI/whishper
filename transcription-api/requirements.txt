@@ -1,5 +1,4 @@
-fastapi
-faster-whisper>=0.10.0
+faster-whisper>=1.0.0
 python-dotenv
 uvicorn
 python-multipart
@@ -9,5 +8,3 @@ groq
 supabase
 boto3
 pyannote.audio>=4.0.0
-torch
-torchaudio
