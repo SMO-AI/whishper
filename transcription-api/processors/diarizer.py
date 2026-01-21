@@ -246,19 +246,16 @@ class PyannoteDiarizer:
         # However, purely fixing split sentences is easier if we look at text flow.
         
         system_prompt = (
-            "You are a professional transcript editor. "
-            "Your inputs are JSON segments of a conversation with 'speaker' and 'text'. "
-            "The speaker labels were generated automatically and may have errors, specifically:\n"
-            "1. A single sentence might be split across two speakers (e.g., Sp1: 'I am going', Sp2: 'to the park'). Fix this by assigning the correct speaker to the continuation.\n"
-            "2. Illogical short turns. \n"
-            "3. Formatting issues.\n\n"
-            "Your goal is to RETURN THE CORRECTED JSON segments. \n"
-            "Rules:\n"
-            "- Do NOT change the text content (unless merging split words).\n"
-            "- You MAY merge adjacent segments if they belong to the same speaker and form a coherent sentence.\n"
-            "- You MAY change the 'speaker' label to make the conversation flow logically.\n"
-            "- Ensure the JSON is valid.\n"
-            "- Do NOT add any conversational filler before or after the JSON."
+            "You are a smart transcript editor. "
+            "Your ONLY goal is to fix 'Speaker Diarization Errors' where a single sentence is incorrectly split between two different speakers.\n\n"
+            "Context:\n"
+            "- Sometimes Speaker A pauses, and the system incorrectly thinks Speaker B started talking.\n"
+            "- Your job is to look at the TEXT flow. If the text clearly continues a sentence, assign the SAME speaker as the previous segment.\n\n"
+            "Input: JSON list of segments.\n"
+            "Output: JSON list of segments with CORRECTED 'speaker' labels. DO NOT change text.\n\n"
+            "Example:\n"
+            "Input: [{'id': 1, 'speaker': 'A', 'text': 'I want to'}, {'id': 2, 'speaker': 'B', 'text': 'go home.'}]\n"
+            "Output: [{'id': 1, 'speaker': 'A', 'text': 'I want to'}, {'id': 2, 'speaker': 'A', 'text': 'go home.'}]"
         )
 
         import json
@@ -267,27 +264,12 @@ class PyannoteDiarizer:
         refined_segments = []
         chunk_size = 50
         
-        # We need to be careful with boundaries. 
-        # For simplicity in this iteration, let's process the whole list if it's small (<200 segments), otherwise chunk.
-        # Assuming most uploads are < 1 hour, < 1000 segments. 
-        # Llama 3.3 70B has huge context. Let's try sending all (up to a limit) or simple batching.
-        
-        # Let's try to refine in one go for consistency if < 300 segments, else batch.
-        # To be safe, let's implement a simple non-overlapping batch for now, or just return original if it fails.
-        
-        # Actually, let's use the LlamaDiarizer logic but adapted for *correction*.
-        # Re-using the prompt approach.
-        
         try:
              # Simplify: pass only id, speaker, text
             light_segments = [{"id": s.get("id", i), "speaker": s["speaker"], "text": s["text"]} for i, s in enumerate(segments)]
             
             # Create the user message
             user_content = json.dumps(light_segments, ensure_ascii=False)
-            
-            # If too long, we might need to truncate or chunk. For now, let's try straight call.
-            # 20 segments ~ 200 tokens. 1000 segments ~ 10k tokens. Llama 3 handles 128k. 
-            # So passing all segments is feasible for standard meetings.
             
             response = client.chat.completions.create(
                 model=model,
@@ -302,16 +284,18 @@ class PyannoteDiarizer:
             content = response.choices[0].message.content
             corrected_data = json.loads(content)
             
-            # The result should be a list of segments.
-            # We need to map `segments` (original) with `corrected_data` (list or dict).
-            # If the LLM returns a list
-            corrected_list = corrected_data.get("segments", corrected_data)
-            if isinstance(corrected_list, dict):
-                 # sometimes it wraps in root key
-                 for k in corrected_list:
-                     if isinstance(corrected_list[k], list):
-                         corrected_list = corrected_list[k]
-                         break
+            # Robust parsing for list or dict response
+            corrected_list = []
+            if isinstance(corrected_data, dict):
+                corrected_list = corrected_data.get("segments", corrected_data)
+                # If it's still a dict, maybe nested under another key? try to find first list value
+                if isinstance(corrected_list, dict):
+                    for k, v in corrected_list.items():
+                        if isinstance(v, list):
+                            corrected_list = v
+                            break
+            elif isinstance(corrected_data, list):
+                corrected_list = corrected_data
             
             if not isinstance(corrected_list, list):
                  logger.warning("LLM response is not a list")
