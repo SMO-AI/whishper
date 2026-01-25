@@ -125,7 +125,6 @@ func transcribe(s *api.Server, t *models.Transcription) error {
 		api.SupabaseSyncTranscription(map[string]interface{}{
 			"id":         t.ID.Hex(),
 			"user_id":    t.UserID,
-			"filename":   t.FileName,
 			"text":       t.Result.Text,
 			"duration":   t.Result.Duration,
 			"language":   t.Result.Language,
@@ -135,13 +134,13 @@ func transcribe(s *api.Server, t *models.Transcription) error {
 
 		// Sync Usage Log
 		api.SupabaseSyncUsage(map[string]interface{}{
-			"user_id":    t.UserID,
-			"usage_type": "transcription",
-			"amount":     t.Result.Duration,
-			"cost":       cost,
+			"user_id":          t.UserID,
+			"transcription_id": t.ID.Hex(),
+			"usage_type":       "transcription",
+			"amount":           t.Result.Duration,
+			"cost":             cost,
 			"details": map[string]interface{}{
-				"model":    t.ModelSize,
-				"filename": t.FileName,
+				"model": t.ModelSize,
 			},
 			"created_at": time.Now(),
 		})

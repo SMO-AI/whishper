@@ -182,17 +182,40 @@
 	async function openUserDetails(user) {
 		selectedUser = user;
 		loadingActivity = true;
+
+		// 1. Initial load from local data for instant feedback
+		const localTrans = transcriptionsData
+			.filter((t) => t.user_id === user.id)
+			.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+			.slice(0, 10)
+			.map((t) => {
+				const associatedLogs = logs.filter((l) => l.transcription_id === t.id);
+				return { ...t, whishper_usage_logs: associatedLogs };
+			});
+
+		userActivity = localTrans;
+
 		try {
+			// 2. Fetch fresh data from Supabase for completeness (e.g. if activity is outside current date range)
 			const { data: activity, error } = await supabase
 				.from('whishper_transcriptions')
 				.select('*, whishper_usage_logs(*)')
 				.eq('user_id', user.id)
 				.order('created_at', { ascending: false })
 				.limit(10);
-			if (error) throw error;
-			userActivity = activity;
+
+			if (error) {
+				console.warn('Supabase activity fetch failed, using local data:', error);
+				// If we have local data, don't throw, just keep what we have
+				if (userActivity.length > 0) return;
+				throw error;
+			}
+
+			if (activity && activity.length > 0) {
+				userActivity = activity;
+			}
 		} catch (e) {
-			console.error(e);
+			console.error('Error fetching user activity details:', e);
 		} finally {
 			loadingActivity = false;
 		}
@@ -646,8 +669,9 @@
 												>
 											</div>
 											<div class="flex items-center gap-2 mt-1">
-												<span class="text-sm font-bold truncate max-w-[300px]"
-													>{log.filename || log.name || log.mimetype || 'Unnamed Task'}</span
+												<span
+													class="text-sm font-mono opacity-50 truncate max-w-[300px]"
+													title={log.id}>Transcription ID: {log.id.split('-')[0]}...</span
 												>
 												<span
 													class="text-[10px] bg-secondary/10 text-secondary px-2 py-0.5 rounded font-black uppercase"
@@ -834,8 +858,11 @@
 											>
 										</div>
 										<div>
-											<div class="font-bold text-sm truncate max-w-[200px]">
-												{act.filename || act.name || act.mimetype || 'Transcription'}
+											<div
+												class="font-mono text-[11px] opacity-60 truncate max-w-[200px]"
+												title={act.id}
+											>
+												ID: {act.id}
 											</div>
 											<div class="text-[10px] opacity-40 uppercase font-black">
 												{getTimeSince(act.created_at)}

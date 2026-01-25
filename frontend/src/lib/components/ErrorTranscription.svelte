@@ -41,7 +41,7 @@
 		<div class="flex-1 flex flex-col justify-center space-y-2 text-center md:text-left">
 			<div class="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-1">
 				<h3 class="text-lg font-bold text-error/80 truncate max-w-md">
-					id-{tr.id}
+					{tr.title || (tr.fileName ? tr.fileName.split('_WHSHPR_')[1] : `id-${tr.id}`)}
 				</h3>
 				<div class="badge badge-error badge-sm font-bold uppercase text-[10px]">{$t('error')}</div>
 			</div>

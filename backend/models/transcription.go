@@ -17,6 +17,7 @@ type Transcription struct {
 	Task         string             `bson:"task" json:"task"`
 	Device       string             `bson:"device" json:"device"`
 	FileName     string             `bson:"fileName" json:"fileName"`
+	Title        string             `bson:"title" json:"title"`
 	SourceUrl    string             `bson:"sourceUrl" json:"sourceUrl"`
 	UserID       string             `bson:"userId" json:"userId"`
 	Result       WhisperResult      `bson:"result" json:"result"`

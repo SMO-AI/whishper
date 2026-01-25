@@ -101,6 +101,38 @@
 	) {
 		wordCount = $currentTranscription.result.text.split(/\s+/).filter((w) => w.length > 0).length;
 	}
+	let isEditingTitle = false;
+	let newTitle = '';
+
+	const startEditing = () => {
+		newTitle = $currentTranscription.title || $currentTranscription.fileName.split('_WHSHPR_')[1];
+		isEditingTitle = true;
+	};
+
+	const saveTitle = async () => {
+		if (!newTitle.trim()) {
+			isEditingTitle = false;
+			return;
+		}
+
+		const oldTitle = $currentTranscription.title;
+		$currentTranscription.title = newTitle;
+		isEditingTitle = false;
+
+		try {
+			const res = await fetch(`${CLIENT_API_HOST}/api/transcriptions`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify($currentTranscription)
+			});
+			if (!res.ok) throw new Error('Failed to save');
+			toast.success('Название обновлено!');
+		} catch (e) {
+			console.error(e);
+			$currentTranscription.title = oldTitle;
+			toast.error('Ошибка сохранения названия');
+		}
+	};
 </script>
 
 <Toaster />
@@ -127,10 +159,40 @@
 						/></svg
 					>
 				</a>
-				<div>
-					<h1 class="text-2xl md:text-3xl font-bold tracking-tight text-base-content">
-						{$currentTranscription.fileName.split('_WHSHPR_')[1]}
-					</h1>
+				<div class="flex-1 min-w-0">
+					{#if isEditingTitle}
+						<div class="flex items-center gap-2">
+							<input
+								type="text"
+								bind:value={newTitle}
+								class="input input-bordered input-md w-full max-w-md font-bold text-xl md:text-2xl h-12"
+								on:keydown={(e) => e.key === 'Enter' && saveTitle()}
+								on:blur={saveTitle}
+								autoFocus
+							/>
+						</div>
+					{:else}
+						<h1
+							class="text-2xl md:text-3xl font-bold tracking-tight text-base-content hover:text-primary cursor-pointer transition-colors flex items-center gap-3 group"
+							on:click={startEditing}
+							title="Нажмите, чтобы переименовать"
+						>
+							{$currentTranscription.title || $currentTranscription.fileName.split('_WHSHPR_')[1]}
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="w-5 h-5 opacity-0 group-hover:opacity-40 transition-opacity"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path
+									d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+								/></svg
+							>
+						</h1>
+					{/if}
 					<div class="flex items-center gap-2 mt-1 text-sm opacity-60">
 						<span class="font-mono text-xs uppercase bg-base-200 px-1.5 py-0.5 rounded"
 							>{$currentTranscription.id}</span

@@ -21,7 +21,7 @@
 	$: snippet = tr.result.text
 		? tr.result.text.substring(0, 150) + (tr.result.text.length > 150 ? '...' : '')
 		: 'No content';
-	$: fileName = tr.fileName ? tr.fileName.split('_WHSHPR_')[1] : 'Unnamed';
+	$: fileName = tr.title || (tr.fileName ? tr.fileName.split('_WHSHPR_')[1] : 'Unnamed');
 	$: duration = tr.result.duration
 		? new Date(Math.round(tr.result.duration) * 1000).toISOString().substr(11, 8)
 		: '00:00:00';

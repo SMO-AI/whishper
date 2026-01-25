@@ -139,7 +139,7 @@
 			</p>
 
 			<div
-				class="flex flex-col sm:flex-row items-center gap-4 animate-fade-in-up delay-300 w-full sm:w-auto px-4"
+				class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up delay-300 w-full sm:w-auto px-4"
 			>
 				<a
 					href="/auth/register"
@@ -422,11 +422,26 @@
 					</div>
 					<div class="text-left">
 						<h3 class="text-3xl sm:text-4xl font-bold mb-2">
-							$15<span class="text-lg text-white/40 font-normal">{$t('per_month')}</span>
+							$7<span class="text-lg text-white/40 font-normal">{$t('per_month')}</span>
 						</h3>
 						<p class="text-white/50 text-sm mb-6 sm:mb-8">{$t('constant_creation')}</p>
 					</div>
 					<ul class="space-y-3 sm:space-y-4 mb-6 sm:mb-8 flex-1 text-left">
+						<li class="flex items-start gap-3 text-sm text-white">
+							<svg
+								class="w-5 h-5 text-primary mt-0.5 shrink-0"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M5 13l4 4L19 7"
+								/></svg
+							>
+							{$t('buy_more_tokens')}
+						</li>
 						<li class="flex items-start gap-3 text-sm text-white">
 							<svg
 								class="w-5 h-5 text-primary mt-0.5 shrink-0"
@@ -525,7 +540,7 @@
 					</div>
 					<div class="text-left">
 						<h3 class="text-3xl sm:text-4xl font-bold mb-2">
-							$49<span class="text-lg text-white/40 font-normal">{$t('per_month')}</span>
+							$15<span class="text-lg text-white/40 font-normal">{$t('per_month')}</span>
 						</h3>
 						<p class="text-white/50 text-sm mb-6 sm:mb-8">{$t('team_power')}</p>
 					</div>
@@ -576,7 +591,7 @@
 									d="M5 13l4 4L19 7"
 								/></svg
 							>
-							{$t('api_access')}
+							{$t('priority_queue')}
 						</li>
 						<li class="flex items-start gap-3 text-sm text-white/80">
 							<svg

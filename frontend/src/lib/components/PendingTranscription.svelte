@@ -2,7 +2,7 @@
 	import { fade } from 'svelte/transition';
 	import { t } from '$lib/stores';
 	export let tr;
-	$: fileName = tr.fileName ? tr.fileName.split('_WHSHPR_')[1] : 'Initializing...';
+	$: fileName = tr.title || (tr.fileName ? tr.fileName.split('_WHSHPR_')[1] : 'Initializing...');
 </script>
 
 <div

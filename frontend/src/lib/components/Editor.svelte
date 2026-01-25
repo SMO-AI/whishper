@@ -267,6 +267,24 @@
 		}
 		clearInterval(autosaveInterval);
 	}
+	let isEditingTitle = false;
+	let newTitle = '';
+
+	const startEditing = () => {
+		newTitle = $currentTranscription.title || $currentTranscription.fileName.split('_WHSHPR_')[1];
+		isEditingTitle = true;
+	};
+
+	const saveTitle = async () => {
+		if (!newTitle.trim()) {
+			isEditingTitle = false;
+			return;
+		}
+		const oldTitle = $currentTranscription.title;
+		$currentTranscription.title = newTitle;
+		isEditingTitle = false;
+		await saveChanges(); // Reuse existing save changes logic
+	};
 </script>
 
 {#if $currentTranscription.status != 2}
@@ -308,13 +326,39 @@
 							>
 						</a>
 
-						<div class="flex flex-col overflow-hidden">
-							<h1
-								class="text-lg md:text-xl font-bold truncate leading-tight tracking-tight"
-								title={$currentTranscription.fileName}
-							>
-								{$currentTranscription.fileName.split('_WHSHPR_')[1]}
-							</h1>
+						<div class="flex flex-col overflow-hidden flex-1">
+							{#if isEditingTitle}
+								<input
+									type="text"
+									bind:value={newTitle}
+									class="input input-bordered input-sm w-full max-w-sm font-bold text-lg"
+									on:keydown={(e) => e.key === 'Enter' && saveTitle()}
+									on:blur={saveTitle}
+									autoFocus
+								/>
+							{:else}
+								<h1
+									class="text-lg md:text-xl font-bold truncate leading-tight tracking-tight hover:text-primary cursor-pointer transition-colors flex items-center gap-2 group"
+									on:click={startEditing}
+									title="Нажмите, чтобы переименовать"
+								>
+									{$currentTranscription.title ||
+										$currentTranscription.fileName.split('_WHSHPR_')[1]}
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="w-3.5 h-3.5 opacity-0 group-hover:opacity-40 transition-opacity"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path
+											d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+										/></svg
+									>
+								</h1>
+							{/if}
 							<span class="text-[10px] uppercase font-bold tracking-widest opacity-40"
 								>Editor Mode</span
 							>
