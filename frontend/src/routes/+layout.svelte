@@ -19,7 +19,7 @@
 
 		if (!session) {
 			const path = window.location.pathname;
-			if (path !== '/' && path !== '/ru' && !path.startsWith('/auth')) {
+			if (path !== '/' && path !== '/ru' && path !== '/changelog' && !path.startsWith('/auth')) {
 				goto('/auth/login');
 			}
 			if (path === '/ru') {
@@ -63,10 +63,17 @@
 			}
 		});
 
-		// Locale persistence
-		const savedLocale = localStorage.getItem('locale');
-		if (savedLocale) {
-			locale.set(savedLocale);
+		// Locale initialization
+		const path = window.location.pathname;
+		if (path === '/ru') {
+			locale.set('ru');
+		} else if (path === '/') {
+			locale.set('en');
+		} else {
+			const savedLocale = localStorage.getItem('locale');
+			if (savedLocale) {
+				locale.set(savedLocale);
+			}
 		}
 
 		locale.subscribe((value) => {

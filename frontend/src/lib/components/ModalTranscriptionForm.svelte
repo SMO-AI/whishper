@@ -9,6 +9,7 @@
 	import toast from 'svelte-french-toast';
 
 	let disableSubmit = true;
+	let isSubmitting = false;
 	let modelSize = 'groq:whisper-large-v3-turbo'; // Default to Groq V3 Turbo as requested
 	let language = 'auto';
 	let sourceUrl = '';
@@ -46,6 +47,9 @@
 			return;
 		}
 
+		if (isSubmitting) return;
+		isSubmitting = true;
+
 		let formData = new FormData();
 		formData.append('language', language);
 		formData.append('modelSize', modelSize);
@@ -82,6 +86,7 @@
 			// Set up load event listener
 			xhr.addEventListener('load', () => {
 				uploadProgress.set(0); // Reset progress after completion
+				isSubmitting = false;
 				if (xhr.status === 200) {
 					resolve(xhr.response);
 					toast.success('Success!');
@@ -102,6 +107,7 @@
 
 			// Set up error event listener
 			xhr.addEventListener('error', () => {
+				isSubmitting = false;
 				reject(xhr.statusText);
 				toast.error($t('upload_error'));
 				uploadProgress.set(0); // Reset progress on error
@@ -163,7 +169,7 @@
 			fileInput.files = files;
 			handleFileChange({ target: fileInput });
 			document.getElementById('modalNewTranscription').showModal();
-			sendForm(); // Automatically start transcription on drop
+			// sendForm(); // Automatically start transcription on drop -> Removed to fix double processing bugs
 		}
 	}
 
@@ -504,9 +510,11 @@
 			<button
 				class="btn btn-primary px-8 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all font-bold tracking-wide"
 				on:click={sendForm}
-				disabled={disableSubmit}
+				disabled={disableSubmit || isSubmitting}
 			>
-				{#if disableSubmit}
+				{#if isSubmitting}
+					<span class="loading loading-spinner loading-sm text-primary-content/50"></span>
+				{:else if disableSubmit}
 					Fill required fields
 				{:else}
 					Start Transcription

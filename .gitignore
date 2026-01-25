@@ -14,3 +14,4 @@ venv
 transcription-api/backends/parallelization.py
 for_test/1(diarization_off).mp3
 for_test/2 (diarization_on).mp3
+SYSTEM_ARCHITECTURE.md
