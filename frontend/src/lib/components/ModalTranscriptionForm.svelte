@@ -391,48 +391,32 @@
 			</div>
 
 			<!-- Configuration Grid -->
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-base-content/10">
-				<div class="form-control w-full">
-					<label class="label" for="model-select">
-						<span class="label-text font-bold text-sm">Model</span>
-					</label>
-					<select
-						id="model-select"
-						name="modelSize"
-						bind:value={modelSize}
-						class="select select-bordered w-full"
-					>
+			<div class="grid grid-cols-1 gap-4 pt-4 border-t border-base-content/10">
+				<!-- Hidden Model and Language settings (kept for backend compatibility) -->
+				<div class="hidden">
+					<select bind:value={modelSize} name="modelSize">
 						{#each models as m}
 							<option value={m.value}>{m.label}</option>
 						{/each}
 					</select>
-				</div>
-
-				<div class="form-control w-full">
-					<label class="label" for="language-select">
-						<span class="label-text font-bold text-sm">Language</span>
-					</label>
-					<select
-						id="language-select"
-						name="language"
-						bind:value={language}
-						class="select select-bordered w-full"
-					>
+					<select bind:value={language} name="language">
 						{#each languages as l}
 							<option value={l.value}>{l.label}</option>
 						{/each}
 					</select>
 				</div>
 
-				<div class="form-control col-span-1 md:col-span-2 mt-2">
+				<div class="form-control mt-2">
 					<label
-						class="label cursor-pointer justify-start gap-4 p-4 rounded-2xl bg-base-200/50 hover:bg-base-200 transition-colors border border-base-content/5"
+						class="label cursor-pointer justify-start gap-4 p-5 rounded-2xl bg-primary/5 hover:bg-primary/10 transition-all border border-primary/20 shadow-sm group"
 					>
-						<input type="checkbox" bind:checked={diarize} class="toggle toggle-primary" />
+						<input type="checkbox" bind:checked={diarize} class="toggle toggle-primary toggle-lg" />
 						<div class="flex flex-col">
-							<span class="label-text font-bold">Распознавание спикеров</span>
-							<span class="text-xs opacity-60"
-								>Разделение на голоса и определение ролей (например, Врач, Пациент)</span
+							<span class="label-text font-bold text-lg group-hover:text-primary transition-colors"
+								>Распознавание спикеров</span
+							>
+							<span class="text-sm opacity-70"
+								>Разделение на голоса и автоматическое определение ролей (например, Врач, Пациент)</span
 							>
 						</div>
 					</label>
@@ -513,7 +497,7 @@
 				disabled={disableSubmit || isSubmitting}
 			>
 				{#if isSubmitting}
-					<span class="loading loading-spinner loading-sm text-primary-content/50"></span>
+					<span class="loading loading-spinner loading-sm text-primary-content/50" />
 				{:else if disableSubmit}
 					Fill required fields
 				{:else}
