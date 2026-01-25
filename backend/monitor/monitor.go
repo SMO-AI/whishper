@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"github.com/rs/zerolog/log"
 
@@ -107,6 +108,45 @@ func transcribe(s *api.Server, t *models.Transcription) error {
 		log.Error().Err(err).Msg("Error updating transcription")
 		return err
 	}
+
+	// Calculate cost for analytical tracking
+	// Estimated prices for Groq/Providers (can be adjusted)
+	ratePerMinute := 0.001 // Default: $0.06 per hour
+	if t.ModelSize == "groq:whisper-large-v3-turbo" {
+		ratePerMinute = 0.0007 // $0.042 per hour
+	} else if t.ModelSize == "groq:whisper-large-v3" {
+		ratePerMinute = 0.0012 // $0.072 per hour
+	}
+	cost := (t.Result.Duration / 60.0) * ratePerMinute
+
+	// Final sync to Supabase
+	go func() {
+		// Sync Transcription
+		api.SupabaseSyncTranscription(map[string]interface{}{
+			"id":         t.ID.Hex(),
+			"user_id":    t.UserID,
+			"filename":   t.FileName,
+			"text":       t.Result.Text,
+			"duration":   t.Result.Duration,
+			"language":   t.Result.Language,
+			"model":      t.ModelSize,
+			"created_at": time.Now(),
+		})
+
+		// Sync Usage Log
+		api.SupabaseSyncUsage(map[string]interface{}{
+			"user_id":    t.UserID,
+			"usage_type": "transcription",
+			"amount":     t.Result.Duration,
+			"cost":       cost,
+			"details": map[string]interface{}{
+				"model":    t.ModelSize,
+				"filename": t.FileName,
+			},
+			"created_at": time.Now(),
+		})
+	}()
+
 	s.BroadcastTranscription(t)
 	return nil
 }

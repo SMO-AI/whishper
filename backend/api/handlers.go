@@ -168,13 +168,23 @@ func (s *Server) handlePostTranscription(c *fiber.Ctx) error {
 		transcription.Device = "cpu"
 	}
 
-	log.Debug().Msgf("Transcription: %+v", transcription)
 	// Save transcription to database
 	res, err := s.Db.NewTranscription(&transcription)
 	if err != nil {
 		log.Error().Err(err).Msg("Error saving transcription to database")
 		return fiber.NewError(fiber.StatusInternalServerError, "Internal server error")
 	}
+
+	// Double-write to Supabase for analytical tracking
+	go SupabaseSyncTranscription(map[string]interface{}{
+		"id":         res.ID.Hex(), // Mongo hex string can be used if it's stored as text or UUID-like
+		"user_id":    res.UserID,
+		"filename":   res.FileName,
+		"language":   res.Language,
+		"model":      res.ModelSize,
+		"mimetype":   res.Task, // Temporary until we have mimetype in model
+		"created_at": time.Now(),
+	})
 
 	// Broadcast transcription to websocket clients
 	s.BroadcastTranscription(res)

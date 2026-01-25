@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -62,8 +63,6 @@ func CheckUserActive(token string, userID string) (bool, error) {
 
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("apikey", apiKey)
-	// Add Range header to ensure we get a list (though usually rest returns list)
-	// But RLS should filter to just the user.
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -86,4 +85,64 @@ func CheckUserActive(token string, userID string) (bool, error) {
 	}
 
 	return profiles[0].Status == "active", nil
+}
+
+// SupabaseSyncTranscription sends a transcription record to Supabase
+func SupabaseSyncTranscription(t map[string]interface{}) error {
+	supabaseUrl := os.Getenv("SUPABASE_URL")
+	apiKey := os.Getenv("SUPABASE_ANON_KEY")
+	if supabaseUrl == "" || apiKey == "" {
+		return nil // Skip if not configured
+	}
+
+	jsonData, _ := json.Marshal(t)
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/rest/v1/whishper_transcriptions", supabaseUrl), bytes.NewBuffer(jsonData))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("apikey", apiKey)
+	req.Header.Set("Authorization", "Bearer "+apiKey)
+	req.Header.Set("Prefer", "resolution=merge-duplicates") // UPSERT equivalent
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("supabase error: %v", resp.Status)
+	}
+	return nil
+}
+
+// SupabaseSyncUsage sends a usage log record to Supabase
+func SupabaseSyncUsage(l map[string]interface{}) error {
+	supabaseUrl := os.Getenv("SUPABASE_URL")
+	apiKey := os.Getenv("SUPABASE_ANON_KEY")
+	if supabaseUrl == "" || apiKey == "" {
+		return nil
+	}
+
+	jsonData, _ := json.Marshal(l)
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/rest/v1/whishper_usage_logs", supabaseUrl), bytes.NewBuffer(jsonData))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("apikey", apiKey)
+	req.Header.Set("Authorization", "Bearer "+apiKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
 }
