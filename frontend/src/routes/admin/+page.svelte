@@ -69,10 +69,15 @@
 				.order('created_at', { ascending: false });
 			if (pErr) throw pErr;
 
-			// 2. Fetch usage logs within range
+			// 2. Fetch usage logs within range (extend end date to catch logs created after transcription)
 			let logsQuery = supabase.from('whishper_usage_logs').select('*');
 			if (dateFrom) logsQuery = logsQuery.gte('created_at', `${dateFrom}T00:00:00`);
-			if (dateTo) logsQuery = logsQuery.lte('created_at', `${dateTo}T23:59:59`);
+			// Extend to end of next day to account for processing time or timezone diffs
+			if (dateTo) {
+				const nextDay = new Date(dateTo);
+				nextDay.setDate(nextDay.getDate() + 1);
+				logsQuery = logsQuery.lte('created_at', `${nextDay.toISOString().split('T')[0]}T23:59:59`);
+			}
 			const { data: usageLogs, error: lErr } = await logsQuery;
 			if (lErr) throw lErr;
 
@@ -114,7 +119,9 @@
 			globalFeed = transcriptions
 				.map((t) => {
 					const profile = profiles.find((p) => p.id === t.user_id);
-					const logEntry = usageLogs.find((l) => l.transcription_id === t.id);
+					const logEntry = usageLogs.find(
+						(l) => String(l.transcription_id) === String(t.id) || l.transcription_id === t.id
+					);
 					return {
 						...t,
 						user_email: profile?.email || 'Unknown',
@@ -685,8 +692,11 @@
 									</div>
 
 									<div class="text-right">
-										<div class="text-2xl font-black font-mono text-secondary">
-											${log.cost || 0}
+										<div
+											class="text-2xl font-black font-mono text-secondary"
+											title="ID: {log.id} | Cost: {log.cost}"
+										>
+											${log.cost !== undefined && log.cost !== null ? log.cost : '0'}
 										</div>
 										<div class="text-[9px] font-black uppercase opacity-40">
 											Groq API Direct Charge
