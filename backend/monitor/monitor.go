@@ -122,7 +122,7 @@ func transcribe(s *api.Server, t *models.Transcription) error {
 	// Final sync to Supabase
 	go func() {
 		// Sync Transcription
-		api.SupabaseSyncTranscription(map[string]interface{}{
+		err := api.SupabaseSyncTranscription(map[string]interface{}{
 			"id":         t.ID.Hex(),
 			"user_id":    t.UserID,
 			"text":       t.Result.Text,
@@ -131,9 +131,12 @@ func transcribe(s *api.Server, t *models.Transcription) error {
 			"model":      t.ModelSize,
 			"created_at": time.Now(),
 		})
+		if err != nil {
+			log.Error().Err(err).Msg("Error syncing transcription to Supabase")
+		}
 
 		// Sync Usage Log
-		api.SupabaseSyncUsage(map[string]interface{}{
+		err = api.SupabaseSyncUsage(map[string]interface{}{
 			"user_id":          t.UserID,
 			"transcription_id": t.ID.Hex(),
 			"usage_type":       "transcription",
@@ -144,6 +147,9 @@ func transcribe(s *api.Server, t *models.Transcription) error {
 			},
 			"created_at": time.Now(),
 		})
+		if err != nil {
+			log.Error().Err(err).Msg("Error syncing usage log to Supabase")
+		}
 	}()
 
 	s.BroadcastTranscription(t)
@@ -247,6 +253,48 @@ func processLargeTranscription(s *api.Server, t *models.Transcription) error {
 
 	s.BroadcastTranscription(t)
 	log.Info().Msgf("Successfully processed large transcription: %s", t.FileName)
+
+	// Calculate cost for analytical tracking - LARGE FILES
+	ratePerMinute := 0.001 // Default: $0.06 per hour
+	if t.ModelSize == "groq:whisper-large-v3-turbo" {
+		ratePerMinute = 0.0007 // $0.042 per hour
+	} else if t.ModelSize == "groq:whisper-large-v3" {
+		ratePerMinute = 0.0012 // $0.072 per hour
+	}
+	cost := (t.Result.Duration / 60.0) * ratePerMinute
+
+	// Final sync to Supabase for Large Files
+	go func() {
+		// Sync Transcription
+		err := api.SupabaseSyncTranscription(map[string]interface{}{
+			"id":         t.ID.Hex(),
+			"user_id":    t.UserID,
+			"text":       t.Result.Text,
+			"duration":   t.Result.Duration,
+			"language":   t.Result.Language,
+			"model":      t.ModelSize,
+			"created_at": time.Now(),
+		})
+		if err != nil {
+			log.Error().Err(err).Msg("Error syncing large transcription to Supabase")
+		}
+
+		// Sync Usage Log
+		err = api.SupabaseSyncUsage(map[string]interface{}{
+			"user_id":          t.UserID,
+			"transcription_id": t.ID.Hex(),
+			"usage_type":       "transcription",
+			"amount":           t.Result.Duration,
+			"cost":             cost,
+			"details": map[string]interface{}{
+				"model": t.ModelSize,
+			},
+			"created_at": time.Now(),
+		})
+		if err != nil {
+			log.Error().Err(err).Msg("Error syncing large transcription usage to Supabase")
+		}
+	}()
 
 	return nil
 }
