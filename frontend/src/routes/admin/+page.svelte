@@ -354,7 +354,7 @@
 				<div class="text-secondary opacity-60 text-xs font-black uppercase tracking-widest mb-1">
 					Total Spent
 				</div>
-				<div class="text-4xl font-black text-secondary">${stats.totalSpent.toFixed(4)}</div>
+				<div class="text-4xl font-black text-secondary">${stats.totalSpent}</div>
 				<div class="mt-2 text-xs opacity-50 font-bold">Groq API Direct Cost</div>
 			</div>
 
@@ -588,7 +588,7 @@
 									</td>
 									<td>
 										<div class="font-mono font-black text-primary text-lg">
-											${(user.totalCost || 0).toFixed(4)}
+											${user.totalCost || 0}
 										</div>
 									</td>
 									<td class="rounded-r-2xl text-right">
@@ -686,7 +686,7 @@
 
 									<div class="text-right">
 										<div class="text-2xl font-black font-mono text-secondary">
-											${(log.cost || 0).toFixed(4)}
+											${log.cost || 0}
 										</div>
 										<div class="text-[9px] font-black uppercase opacity-40">
 											Groq API Direct Charge
@@ -808,7 +808,7 @@
 							>Revenue Influence</span
 						>
 						<div class="text-3xl font-black text-secondary">
-							${(selectedUser.totalCost || 0).toFixed(3)}
+							${selectedUser.totalCost || 0}
 						</div>
 						<div class="text-xs opacity-50 mt-1 font-bold">Groq platform cost</div>
 					</div>
@@ -874,7 +874,7 @@
 											{(act.duration / 60).toFixed(1)}m
 										</div>
 										<div class="text-[10px] opacity-40 font-bold">
-											${(act.whishper_usage_logs?.[0]?.cost || 0).toFixed(4)}
+											${act.whishper_usage_logs?.[0]?.cost || 0}
 										</div>
 									</div>
 								</div>
