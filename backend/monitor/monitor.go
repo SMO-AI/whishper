@@ -119,6 +119,13 @@ func transcribe(s *api.Server, t *models.Transcription) error {
 	}
 	cost := (t.Result.Duration / 60.0) * ratePerMinute
 
+	log.Info().
+		Str("model", t.ModelSize).
+		Float64("duration_sec", t.Result.Duration).
+		Float64("rate_per_min", ratePerMinute).
+		Float64("total_cost", cost).
+		Msg("Calculated transcription cost")
+
 	// Final sync to Supabase
 	go func() {
 		// Sync Transcription
@@ -262,6 +269,13 @@ func processLargeTranscription(s *api.Server, t *models.Transcription) error {
 		ratePerMinute = 0.0012 // $0.072 per hour
 	}
 	cost := (t.Result.Duration / 60.0) * ratePerMinute
+
+	log.Info().
+		Str("model", t.ModelSize).
+		Float64("duration_sec", t.Result.Duration).
+		Float64("rate_per_min", ratePerMinute).
+		Float64("total_cost", cost).
+		Msg("Calculated large file transcription cost")
 
 	// Final sync to Supabase for Large Files
 	go func() {
