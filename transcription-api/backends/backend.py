@@ -1,12 +1,11 @@
-
-from typing import Any, Mapping, TypedDict
+from typing import Any, Mapping, TypedDict, Union, List
 import numpy as np
 from faster_whisper.audio import decode_audio  # type: ignore
 
 SUPPORTED_MODELS = ["tiny", "tiny.en", "small", "small.en", "base", "base.en", "medium", "medium.en", "large-v2", "large-v3"]
 
 WordData = TypedDict(
-    "WordData", {"word": str, "start": float | str, "end": float | str, "score": float}
+    "WordData", {"word": str, "start": Union[float, str], "end": Union[float, str], "score": float}
 )
 
 Segment = TypedDict(
@@ -14,10 +13,10 @@ Segment = TypedDict(
     {
         "id": str,
         "text": str,
-        "start": float | str,
-        "end": float | str,
+        "start": Union[float, str],
+        "end": Union[float, str],
         "score": float,
-        "words": list[WordData],
+        "words": List[WordData],
         "speaker": str,
         "role": str,
     },

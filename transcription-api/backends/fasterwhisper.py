@@ -4,11 +4,12 @@ import os, math
 from tqdm import tqdm  # type: ignore
 import uuid
 from faster_whisper import WhisperModel, download_model, decode_audio
+from typing import Optional
 
 class FasterWhisperBackend(Backend):
     device: str = "cpu"  # cpu, cuda
     quantization: str = "int8"  # int8, float16
-    model: WhisperModel | None = None
+    model: Optional[WhisperModel] = None
 
     def __init__(self, model_size, device: str = "cpu"):
         self.model_size = model_size
